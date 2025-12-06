@@ -2,25 +2,25 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Register;
+use App\Models\Alumni;
 use Illuminate\Http\Request;
 
-class RegisterController extends Controller
+class AlumniController extends Controller
 {
     public function index()
     {
-        return view('layout.register');
+        return view('alumni.index');
     }
 
     public function create()
     {
-        return view('auth.register');
+        return view('auth.alumni');
     }
 
     public function store(Request $request)
     {
         $credentials = $request->validate([
-            'email' => ['required', 'email', 'unique:registers'],
+            'email' => ['required', 'email', 'unique:alumni'],
             'password' => ['required', 'min:6'],
         ]);
 
@@ -51,7 +51,7 @@ class RegisterController extends Controller
     public function update(Request $request, $id)
     {
         $credentials = $request->validate([
-            'email' => ['required', 'email', 'unique:registers,email,'.$id],
+            'email' => ['required', 'email', 'unique:alumni,email,'.$id],
             'password' => ['nullable', 'min:6'],
         ]);
 

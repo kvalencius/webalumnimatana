@@ -13,11 +13,11 @@
             <!-- ***** Menu Start ***** -->
             <ul class="nav">
               <li class="scroll-to-section"><a href="/" class="active">Home</a></li>
-              <li class="scroll-to-section"><a href="{{ url('/#forum') }}">Forum</a></li>
-              <li class="scroll-to-section"><a href="#about">About</a></li>
-              <li class="scroll-to-section"><a href="#pricing">Pricing</a></li>
-              <li class="scroll-to-section"><a href="#newsletter">Newsletter</a></li>
-              <li><div class="gradient-button"><a id="modal_trigger" href="/register"><i class="fa fa-sign-in-alt"></i> Sign In Now</a></div></li> 
+              <li class="scroll-to-section"><a href="{{ url('/#forum') }}">Information</a></li>
+              <li class="scroll-to-section"><a href="#about">Forum</a></li>
+              <li class="scroll-to-section"><a href="/profil">Profil</a></li>
+              <li class="scroll-to-section"><a href="/alumni">List</a></li>
+              <li></li> 
             </ul>        
             <a class='menu-trigger'>
                 <span>Menu</span>

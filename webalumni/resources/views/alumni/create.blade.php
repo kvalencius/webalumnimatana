@@ -2,9 +2,8 @@
 
 @extends('layout.layout')
 
-@section('content')
-<div id="modal" class="popupContainer" style="display:block;">
-    <div class="popupHeader">
+@section('layout.content')
+<!-- <div id="modal" class="popupContainer" style="display:block;"> -->
         <div class="user_register">
             <form>
 
@@ -27,6 +26,4 @@
                 </div>
             </form>
         </div>
-    </section>
-</div>
 @endsection

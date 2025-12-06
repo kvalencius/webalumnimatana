@@ -1,7 +1,8 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\RegisterController;
+use App\Http\Controllers\AlumniController;
+use App\Http\Controllers\AuthController;
 
 /*
 |--------------------------------------------------------------------------
@@ -15,11 +16,25 @@ use App\Http\Controllers\RegisterController;
 */
 
 Route::get('/', function () {
-    return view('layout.layout');
+    return view('layout.beranda');
 });
 
 Route::get('/forum', function () {
     return view('layout.forum');
 });
 
-Route::resource('register', RegisterController::class);
+// user
+Route::get('/daftar', [AuthController::class, 'registrationForm']);
+
+Route::post('/daftar', [AuthController::class, 'register']);
+
+Route::get('/login', [AuthController::class, 'loginForm']);
+
+Route::post('/login', [AuthController::class, 'login']);
+
+Route::get('/logout', [AuthController::class, 'logout']);
+
+Route::get('/profil', [AuthController::class, 'profil'])->middleware('auth');
+
+//alumni
+Route::resource('alumni', AlumniController::class);
