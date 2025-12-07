@@ -342,9 +342,9 @@ https://templatemo.com/tm-570-chain-app-dev
     </div>
   </div>  -->
 
-  <footer id="contact-us">
+  <div class="footer">
     @include('layout.footer')
-  </footer>
+  </div>
 
 
   <!-- Scripts -->
