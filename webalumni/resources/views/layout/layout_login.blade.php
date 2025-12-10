@@ -21,15 +21,17 @@
     <link rel="stylesheet" href="assets/css/animated.css">
     <link rel="stylesheet" href="assets/css/owl.css">
 </head>
-<body class="flex flex-col min-h-screen bg-slate-50">
-    <div class="flex-grow flex items-center justify-center py-12 px-4">
+<body class="min-h-screen flex flex-col relative z-10">
+    <div class="flex-grow flex items-center justify-center py-12 px-4 relative z-20">
         <div class="w-full max-w-lg bg-white shadow-lg rounded-2xl p-8">
             @yield('content')
         </div>
     </div>
     
-    <!-- Footer with Background -->
-    @include('layout.footerlain')
+    <!-- Footer -->
+    <div>
+        @include('layout.footerlain')
+    </div>
 
   <script src="vendor/jquery/jquery.min.js"></script>
   <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>

@@ -12,7 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            //
+            $table->string('role')->nullable();
+            $table->string('profile_picture')->nullable();
+            $table->boolean('data_completed')->default(false);
         });
     }
 
@@ -22,7 +24,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            //
+            $table->dropColumn(['role', 'profile_picture', 'data_completed']);
         });
     }
 };

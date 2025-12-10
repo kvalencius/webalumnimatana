@@ -1,4 +1,4 @@
-@extends('layout.login')
+@extends('layout.  ,.,m login')
 @section('content')
  <div class="container d-flex justify-content-center align-items-center vh-100">
         <div class="card p-4 shadow" style="width: 400px;">
