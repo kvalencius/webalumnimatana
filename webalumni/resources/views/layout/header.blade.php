@@ -26,32 +26,40 @@
             </ul>
 
             <!-- Profile Picture & Auth Section -->
-            <div class="header-auth flex-end
-               items-center gap-4">
+            <div class="header-auth d-flex align-items-center" style="gap: 1rem; margin-left: auto;">
               @auth
-                <div class="relative group">
+                <div class="profile-dropdown position-relative">
                   @if(Auth::user()->profile_picture)
                     <img src="{{ asset('storage/' . Auth::user()->profile_picture) }}" alt="{{ Auth::user()->name }}"
-                      class="w-10 h-10 rounded-full cursor-pointer object-cover border-2 border-indigo-500">
+                      class="rounded-circle border border-primary" style="width: 40px; height: 40px; object-fit: cover; cursor: pointer;">
                   @else
-                    <div class="w-10 h-10 rounded-full bg-indigo-500 flex items-center justify-center cursor-pointer">
+                    <div class="rounded-circle bg-primary d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; cursor: pointer;">
                       <i class="fas fa-user text-white"></i>
                     </div>
                   @endif
                   
                   <!-- Dropdown Menu -->
-                  <div class="hidden group-hover:block absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg z-50">
-                    <a href="/profil" class="block px-4 py-2 text-slate-700 hover:bg-slate-100 rounded-t-lg">
+                  <div class="dropdown-menu-custom bg-white rounded shadow position-absolute" style="right: 0; top: 100%; width: 200px; display: none; z-index: 1000;">
+                    <a href="/profil" class="d-block px-3 py-2 text-dark text-decoration-none border-bottom hover-bg-light">
                       <i class="fas fa-user mr-2"></i>Profil Saya
                     </a>
-                    <a href="/logout" class="block px-4 py-2 text-rose-600 hover:bg-rose-50 rounded-b-lg">
+                    <a href="/logout" class="d-block px-3 py-2 text-danger text-decoration-none hover-bg-light">
                       <i class="fas fa-sign-out-alt mr-2"></i>Logout
                     </a>
                   </div>
                 </div>
+                
+                <style>
+                  .profile-dropdown:hover .dropdown-menu-custom {
+                    display: block !important;
+                  }
+                  .hover-bg-light:hover {
+                    background-color: #f8f9fa;
+                  }
+                </style>
               @else
                 <div class="gradient-button">
-                  <a href="/login"><i class="fa fa-sign-in-alt"></i> Sign In Now</a>
+                  <a href="/login"><i class="fa fa-sign-in-alt"></i> Masuk</a>
                 </div>
               @endauth
             </div>

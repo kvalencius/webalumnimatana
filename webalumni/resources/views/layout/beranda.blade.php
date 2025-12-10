@@ -7,9 +7,11 @@
       <h2>Selamat Datang para Alumni, Mahasiswa dan Dosen Matana</h2>
       <p>Website ini dirancang untuk menghubungkan mahasiswa aktif, alumni dan dosen Matana.</p>
       </div>
+      @guest
       <div class="white-button first-button scroll-to-section">
         <li><div class="gradient-button"><a id="modal_trigger" href="/login"><i class="fa fa-sign-in-alt"></i> Masuk</a></div></li> 
       </div>
+      @endguest
     </div>
 @endsection
 
