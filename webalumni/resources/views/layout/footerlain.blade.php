@@ -20,6 +20,12 @@
     position: relative;
     z-index: 10;
   }
+
+  .container-footer {
+    padding: 40px;
+    border-radius: 8px;
+    color: white;
+  }
 </style>
 
 <div class="page-background-fixed"></div>
