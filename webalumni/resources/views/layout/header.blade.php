@@ -16,8 +16,11 @@
               <li class="scroll-to-section"><a href="{{ url('/#forum') }}">Information</a></li>
               <li class="scroll-to-section"><a href="#about">Forum</a></li>
               @auth
-                <li class="scroll-to-section"><a href="/profil">Profil</a></li>
+                <li class="scroll-to-section"><a href="/profil">Profil</a>
+                <div>
+                </li>
                 <li class="scroll-to-section"><a href="/alumni">List</a></li>
+                <li></li>
               @else
                 <li class="scroll-to-section"><a href="/profil">Profil</a></li>
                 <li class="scroll-to-section"><a href="/alumni">List</a></li>
@@ -26,7 +29,7 @@
             </ul>
 
             <!-- Profile Picture & Auth Section -->
-            <div class="header-auth d-flex align-items-center" style="gap: 1rem; margin-left: auto;">
+            <!-- <div class="header-auth d-flex align-items-center" style="gap: 1rem; margin-left: auto;">
               @auth
                 <div class="profile-dropdown position-relative">
                   @if(Auth::user()->profile_picture)
@@ -36,9 +39,9 @@
                     <div class="rounded-circle bg-primary d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; cursor: pointer;">
                       <i class="fas fa-user text-white"></i>
                     </div>
-                  @endif
+                  @endif -->
                   
-                  <!-- Dropdown Menu -->
+                  <!-- Dropdown Menu
                   <div class="dropdown-menu-custom bg-white rounded shadow position-absolute" style="right: 0; top: 100%; width: 200px; display: none; z-index: 1000;">
                     <a href="/profil" class="d-block px-3 py-2 text-dark text-decoration-none border-bottom hover-bg-light">
                       <i class="fas fa-user mr-2"></i>Profil Saya
@@ -47,9 +50,9 @@
                       <i class="fas fa-sign-out-alt mr-2"></i>Logout
                     </a>
                   </div>
-                </div>
+                </div> -->
                 
-                <style>
+                <!-- <style>
                   .profile-dropdown:hover .dropdown-menu-custom {
                     display: block !important;
                   }
@@ -66,7 +69,7 @@
 
             <a class='menu-trigger'>
                 <span>Menu</span>
-            </a>
+            </a> -->
             <!-- ***** Menu End ***** -->
           </nav>
         </div>

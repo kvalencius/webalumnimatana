@@ -41,7 +41,7 @@
             <option value="melanjutkan_studi">Melanjutkan Studi</option>
         </select>
     </div>
-    <div id="job-fields" class="hidden space-y-4">
+    <div id="job-fields" class="space-y-4">
         <div>
             <label for="company_name" class="block text-sm font-medium text-slate-700">Nama Perusahaan</label>
             <input id="company_name" name="company_name" type="text"
