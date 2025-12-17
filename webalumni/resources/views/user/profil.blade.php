@@ -110,9 +110,9 @@
                     @case('alumni')
                         <div class="flex justify-between items-center mb-4">
                             <h4 class="text-lg font-bold text-slate-800">Data Alumni</h4>
-                            <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#editAlumniModal">
+                            <a href="{{ route('alumni.edit', $data->user_id) }}" class="btn btn-sm btn-primary">
                                 <i class="fas fa-edit"></i> Edit
-                            </button>
+                            </a>
                         </div>
                         
                         <div class="rounded-lg border border-slate-200 p-4">
@@ -329,115 +329,4 @@
     </div>
 </div>
 
-<!-- Edit Alumni Modal -->
-@if($user->role === 'alumni' && $data)
-<div class="modal fade" id="editAlumniModal" tabindex="-1" aria-labelledby="editAlumniLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="editAlumniLabel">Edit Data Alumni</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <form action="{{ route('alumni.update') }}" method="POST">
-                @csrf
-                <div class="modal-body">
-                    @if ($errors->any())
-                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                            <strong>Terjadi Kesalahan!</strong>
-                            <ul class="mb-0">
-                                @foreach ($errors->all() as $error)
-                                    <li>{{ $error }}</li>
-                                @endforeach
-                            </ul>
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                        </div>
-                    @endif
-
-                    <div class="mb-3">
-                        <label for="nim" class="form-label">NIM <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control @error('nim') is-invalid @enderror" id="nim" name="nim" value="{{ old('nim', $data->nim) }}" required>
-                        @error('nim')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="graduation_year" class="form-label">Tahun Lulus <span class="text-danger">*</span></label>
-                        <input type="number" class="form-control @error('graduation_year') is-invalid @enderror" id="graduation_year" name="graduation_year" value="{{ old('graduation_year', $data->graduation_year) }}" min="2000" max="{{ date('Y') }}" required>
-                        @error('graduation_year')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="major" class="form-label">Program Studi <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control @error('major') is-invalid @enderror" id="major" name="major" value="{{ old('major', $data->major) }}" required>
-                        @error('major')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="current_job" class="form-label">Status Pekerjaan <span class="text-danger">*</span></label>
-                        <select class="form-select @error('current_job') is-invalid @enderror" id="current_job" name="current_job" required onchange="toggleJobFields()">
-                            <option value="">-- Pilih Status --</option>
-                            <option value="bekerja" {{ old('current_job', $data->current_job) === 'bekerja' ? 'selected' : '' }}>Bekerja</option>
-                            <option value="tidak_bekerja" {{ old('current_job', $data->current_job) === 'tidak_bekerja' ? 'selected' : '' }}>Tidak Bekerja</option>
-                            <option value="melanjutkan_studi" {{ old('current_job', $data->current_job) === 'melanjutkan_studi' ? 'selected' : '' }}>Melanjutkan Studi</option>
-                        </select>
-                        @error('current_job')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
-                    </div>
-
-                    <div class="mb-3" id="company_name_div" style="display: {{ $data->current_job === 'bekerja' ? 'block' : 'none' }};">
-                        <label for="company_name" class="form-label">Nama Perusahaan <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control @error('company_name') is-invalid @enderror" id="company_name" name="company_name" value="{{ old('company_name', $data->company_name) }}">
-                        @error('company_name')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
-                    </div>
-
-                    <div class="mb-3" id="job_position_div" style="display: {{ $data->current_job === 'bekerja' ? 'block' : 'none' }};">
-                        <label for="job_position" class="form-label">Posisi Pekerjaan <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control @error('job_position') is-invalid @enderror" id="job_position" name="job_position" value="{{ old('job_position', $data->job_position) }}">
-                        @error('job_position')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="phone" class="form-label">Nomor Telepon <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control @error('phone') is-invalid @enderror" id="phone" name="phone" value="{{ old('phone', $data->phone) }}" required>
-                        @error('phone')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="salary_range" class="form-label">Rentang Gaji</label>
-                        <input type="text" class="form-control @error('salary_range') is-invalid @enderror" id="salary_range" name="salary_range" value="{{ old('salary_range', $data->salary_range) }}">
-                        @error('salary_range')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                    <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
-<script>
-function toggleJobFields() {
-    const status = document.getElementById('current_job').value;
-    const companyDiv = document.getElementById('company_name_div');
-    const positionDiv = document.getElementById('job_position_div');
-    
-    if (status === 'bekerja') {
-        companyDiv.style.display = 'block';
-        positionDiv.style.display = 'block';
-        document.getElementById('company_name').required = true;
-        document.getElementById('job_position').required = true;
-    } else {
-        companyDiv.style.display = 'none';
-        positionDiv.style.display = 'none';
-        document.getElementById('company_name').required = false;
-        document.getElementById('job_position').required = false;
-    }
-}
-</script>
-@endif
-        <a href="{{ url('/logout') }}" class="text-sm font-semibold text-rose-600 hover:text-rose-500">Logout</a>
-    </div>
-</div>
-
-@include('layout.footer')
 @endsection

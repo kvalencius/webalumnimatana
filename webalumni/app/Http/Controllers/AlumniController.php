@@ -4,70 +4,158 @@ namespace App\Http\Controllers;
 
 use App\Models\Alumni;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class AlumniController extends Controller
 {
-    public function index()
+    public function __construct()
     {
-        return view('alumni.index');
+        $this->middleware('auth');
     }
 
+    /**
+     * Show the create form for alumni data
+     */
     public function create()
     {
-        return view('auth.alumni');
+        $user = Auth::user();
+        if ($user->role !== 'alumni') {
+            abort(403);
+        }
+
+        $alumni = Alumni::find($user->id);
+        return view('alumni.create', compact('alumni'));
     }
 
+    /**
+     * Store alumni data
+     */
     public function store(Request $request)
     {
-        $credentials = $request->validate([
-            'email' => ['required', 'email', 'unique:alumni'],
-            'password' => ['required', 'min:6'],
+        $user = Auth::user();
+        if ($user->role !== 'alumni') {
+            abort(403);
+        }
+
+        $validated = $request->validate([
+            'nim' => 'required|string',
+            'graduation_year' => 'required|integer|min:2000|max:' . date('Y'),
+            'major' => 'required|string',
+            'current_job' => 'required|in:bekerja,tidak_bekerja,melanjutkan_studi',
+            'company_name' => 'required_if:current_job,bekerja|string',
+            'job_position' => 'required_if:current_job,bekerja|string',
+            'salary_range' => 'string|nullable',
+            'phone' => 'required|string',
         ]);
 
-        // Hash password dan simpan ke database
-        $credentials['password'] = bcrypt($credentials['password']);
-        
-        if (Register::create($credentials)) {
-            return redirect('/forum')->with('success', 'Registration successful!');
-        } else {
-            return back()->withErrors([
-                'email' => 'Registration failed. Please try again.',
-            ])->onlyInput('email');
+        try {
+            $validated['user_id'] = $user->id;
+            
+            $exists = DB::table('alumni')->where('user_id', $user->id)->exists();
+            
+            if ($exists) {
+                DB::table('alumni')->where('user_id', $user->id)->update($validated);
+                \Log::info('Alumni data updated via DB', ['user_id' => $user->id]);
+            } else {
+                DB::table('alumni')->insert($validated);
+                \Log::info('Alumni data created via DB', ['user_id' => $user->id, 'data' => $validated]);
+            }
+
+            $user->update(['data_completed' => true]);
+
+            return redirect('/profil')->with('success', 'Data alumni berhasil disimpan');
+        } catch (\Exception $e) {
+            \Log::error('Error storing alumni data', [
+                'user_id' => $user->id,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            return back()->withInput()->with('error', 'Gagal menyimpan data: ' . $e->getMessage());
         }
     }
 
-    public function show($id)
-    {
-        $register = Register::find($id);
-        return view('register.show', compact('register'));
-    }
-
+    /**
+     * Show the edit form for alumni
+     */
     public function edit($id)
     {
-        $register = Register::find($id);
-        return view('register.edit', compact('register'));
-    }
-
-    public function update(Request $request, $id)
-    {
-        $credentials = $request->validate([
-            'email' => ['required', 'email', 'unique:alumni,email,'.$id],
-            'password' => ['nullable', 'min:6'],
-        ]);
-
-        if ($credentials['password']) {
-            $credentials['password'] = bcrypt($credentials['password']);
-        } else {
-            unset($credentials['password']);
+        $user = Auth::user();
+        if ($user->role !== 'alumni' || $user->id != $id) {
+            abort(403);
         }
 
-        Register::find($id)->update($credentials);
-        return redirect('/forum')->with('success', 'Update successful!');
+        $alumni = Alumni::find($id);
+        if (!$alumni) {
+            return redirect()->route('alumni.create')
+                ->with('error', 'Data alumni tidak ditemukan');
+        }
+
+        return view('alumni.edit', compact('alumni'));
     }
 
+    /**
+     * Update alumni data
+     */
+    public function update(Request $request, $id)
+    {
+        $user = Auth::user();
+        if ($user->role !== 'alumni' || $user->id != $id) {
+            abort(403);
+        }
+
+        $validated = $request->validate([
+            'nim' => 'required|string',
+            'graduation_year' => 'required|integer|min:2000|max:' . date('Y'),
+            'major' => 'required|string',
+            'current_job' => 'required|in:bekerja,tidak_bekerja,melanjutkan_studi',
+            'company_name' => 'required_if:current_job,bekerja|string',
+            'job_position' => 'required_if:current_job,bekerja|string',
+            'salary_range' => 'string|nullable',
+            'phone' => 'required|string',
+        ]);
+
+        try {
+            $validated['user_id'] = $user->id;
+            
+            DB::table('alumni')->where('user_id', $id)->update($validated);
+            
+            \Log::info('Alumni data updated', ['user_id' => $id]);
+            
+            return redirect()->route('profil')->with('success', 'Data alumni berhasil diperbarui!');
+        } catch (\Exception $e) {
+            \Log::error('Error updating alumni data', [
+                'user_id' => $id,
+                'error' => $e->getMessage()
+            ]);
+            
+            return back()->withInput()->with('error', 'Gagal memperbarui data: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Show alumni profile (kept for backward compatibility)
+     */
+    public function show($id)
+    {
+        return redirect()->route('profil');
+    }
+
+    /**
+     * Display listing (not used in current flow)
+     */
+    public function index()
+    {
+        // Not implemented - alumni access their own profile via profil route
+        abort(404);
+    }
+
+    /**
+     * Delete alumni data (not implemented)
+     */
     public function destroy($id)
     {
-        Register::find($id)->delete();
-        return redirect('/forum')->with('success', 'Delete successful!');
+        abort(404);
     }
 }

@@ -50,13 +50,6 @@ Route::middleware('auth')->group(function () {
     Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
     Route::get('/profil', [AuthController::class, 'profil'])->name('profil');
     
-    // Data collection routes
-    Route::get('/data/{role}', [AuthController::class, 'dataForm'])->name('data.form');
-    Route::post('/data/{role}', [AuthController::class, 'storeData'])->name('data.store');
-    
-    // Update alumni data from profile - must be before resource route
-    Route::post('/alumni/update-data', [AuthController::class, 'updateAlumniData'])->name('alumni.update');
-    
     // Profile picture upload
     Route::post('/profile-picture', [AuthController::class, 'updateProfilePicture'])->name('profile.picture.update');
     
@@ -65,5 +58,11 @@ Route::middleware('auth')->group(function () {
     Route::post('/tracer-study', [TracerStudyController::class, 'store'])->name('tracer.store');
 });
 
-// Alumni routes
-Route::resource('alumni', AlumniController::class);
+// Alumni resource routes
+Route::resource('alumni', AlumniController::class)->middleware('auth');
+
+// Student resource routes (for future expansion)
+Route::resource('student', 'App\Http\Controllers\StudentController')->middleware('auth');
+
+// Teacher resource routes (for future expansion)
+Route::resource('teacher', 'App\Http\Controllers\TeacherController')->middleware('auth');
