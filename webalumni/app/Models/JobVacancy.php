@@ -22,17 +22,13 @@ class JobVacancy extends Model
         'gaji_max',
         'kontak_email',
         'kontak_phone',
-        'status',
-        'rejection_note',
+        'status', // Tetap ada di fillable untuk berjaga-jaga, meski default 'approved'
         'posted_by',
-        'approved_by',
-        'approved_at'
     ];
 
     protected $casts = [
         'gaji_min' => 'decimal:2',
         'gaji_max' => 'decimal:2',
-        'approved_at' => 'datetime',
     ];
 
     // ========================================
@@ -42,30 +38,6 @@ class JobVacancy extends Model
     public function postedBy()
     {
         return $this->belongsTo(User::class, 'posted_by');
-    }
-
-    public function approvedBy()
-    {
-        return $this->belongsTo(User::class, 'approved_by');
-    }
-
-    // ========================================
-    // SCOPES (Query Helpers)
-    // ========================================
-    
-    public function scopeApproved($query)
-    {
-        return $query->where('status', 'approved');
-    }
-
-    public function scopePending($query)
-    {
-        return $query->where('status', 'pending');
-    }
-
-    public function scopeRejected($query)
-    {
-        return $query->where('status', 'rejected');
     }
 
     // ========================================
@@ -91,12 +63,11 @@ class JobVacancy extends Model
             return 'Hingga Rp ' . number_format($this->gaji_max, 0, ',', '.');
         }
         
-        return 'Negosiable';
+        return 'Nego';
     }
 
     /**
      * Waktu relatif sejak posting
-     * Usage: $job->time_ago
      */
     public function getTimeAgoAttribute()
     {
@@ -104,73 +75,40 @@ class JobVacancy extends Model
     }
 
     /**
-     * Badge HTML untuk status
-     * Usage: {!! $job->status_badge !!}
-     */
-    public function getStatusBadgeAttribute()
-    {
-        $badges = [
-            'pending' => '<span class="badge bg-warning text-dark">⏳ Pending</span>',
-            'approved' => '<span class="badge bg-success">✅ Disetujui</span>',
-            'rejected' => '<span class="badge bg-danger">❌ Ditolak</span>',
-        ];
-
-        return $badges[$this->status] ?? '<span class="badge bg-secondary">Unknown</span>';
-    }
-
-    /**
      * Format tipe pekerjaan yang lebih readable
-     * Usage: $job->tipe_pekerjaan_label
      */
     public function getTipePekerjaanLabelAttribute()
     {
         $labels = [
-            'full_time' => 'Full Time',
-            'part_time' => 'Part Time',
+            'full_time'  => 'Full Time',
+            'part_time'  => 'Part Time',
             'internship' => 'Internship',
-            'contract' => 'Contract',
-            'freelance' => 'Freelance',
+            'contract'   => 'Kontrak',
+            'freelance'  => 'Freelance',
         ];
 
         return $labels[$this->tipe_pekerjaan] ?? ucfirst(str_replace('_', ' ', $this->tipe_pekerjaan));
     }
 
+    // ========================================
+    // PERMISSION CHECKERS
+    // ========================================
+
     /**
      * Check apakah user adalah pemilik loker ini
-     * Usage: $job->isOwnedBy($user)
+     * Hanya alumni yang bisa memiliki loker
      */
     public function isOwnedBy($user)
     {
+        if (!$user) return false;
         return $this->posted_by === $user->id;
     }
 
     /**
-     * Check apakah loker bisa diedit
-     * Usage: $job->canBeEditedBy($user)
+     * Karena tidak ada admin, hanya pemilik (Alumni) yang bisa edit/delete
      */
-    public function canBeEditedBy($user)
+    public function canBeManagedBy($user)
     {
-        // Admin/Teacher bisa edit semua
-        if (in_array($user->role, ['admin', 'teacher'])) {
-            return true;
-        }
-
-        // Alumni hanya bisa edit loker sendiri
-        return $this->isOwnedBy($user);
-    }
-
-    /**
-     * Check apakah loker bisa dihapus
-     * Usage: $job->canBeDeletedBy($user)
-     */
-    public function canBeDeletedBy($user)
-    {
-        // Admin/Teacher bisa delete semua
-        if (in_array($user->role, ['admin', 'teacher'])) {
-            return true;
-        }
-
-        // Alumni hanya bisa delete loker sendiri
         return $this->isOwnedBy($user);
     }
 }
