@@ -74,7 +74,17 @@ class AuthController extends Controller
         ]);
 
         Auth::login($user);
-        return redirect()->route('alumni.create', ['role' => $user->role]);
+        
+        // Redirect berdasarkan role
+        if ($user->role === 'alumni') {
+            return redirect()->route('alumni.create');
+        } elseif ($user->role === 'student') {
+            return redirect()->route('student.create');
+        } elseif ($user->role === 'teacher') {
+            return redirect()->route('teacher.create');
+        }
+        
+        return redirect()->route('alumni.create');
     }
 
     // Tampilkan form pengumpulan data sesuai role
@@ -153,7 +163,7 @@ class AuthController extends Controller
         if ($user->role === 'alumni') {
             $data = Alumni::with('tracerStudy')->find($user->id);
         } elseif ($user->role === 'student') {
-            $data = Student::find($user->id);
+            $data = Student::where('user_id', $user->id)->first();
         } elseif ($user->role === 'teacher') {
             $data = Teacher::find($user->id);
         }

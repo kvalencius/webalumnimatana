@@ -23,7 +23,7 @@ class StudentController extends Controller
             abort(403);
         }
 
-        $student = Student::find($user->id);
+        $student = Student::where('user_id', $user->id)->first();
         return view('student.create', compact('student'));
     }
 
@@ -75,7 +75,7 @@ class StudentController extends Controller
             abort(403);
         }
 
-        $student = Student::find($id);
+        $student = Student::where('user_id', $id)->first();
         if (!$student) {
             return redirect()->route('student.create')
                 ->with('error', 'Data mahasiswa tidak ditemukan');

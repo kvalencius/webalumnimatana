@@ -288,6 +288,13 @@
                         @break
                     
                     @case('student')
+                        <div class="flex justify-between items-center mb-4">
+                            <h4 class="text-lg font-bold text-slate-800">Data Akademik</h4>
+                            <a href="{{ route('student.edit', $user->id) }}" class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-500 text-sm font-semibold">
+                                <i class="fas fa-edit"></i> Edit
+                            </a>
+                        </div>
+
                         <div class="rounded-lg border border-slate-200 p-4">
                             <p class="text-sm text-slate-500">NIM</p>
                             <p class="text-lg font-semibold text-slate-800">{{ $data->nim }}</p>
@@ -299,6 +306,14 @@
                         <div class="rounded-lg border border-slate-200 p-4">
                             <p class="text-sm text-slate-500">Semester</p>
                             <p class="text-lg font-semibold text-slate-800">{{ $data->semester }}</p>
+                        </div>
+                        <div class="rounded-lg border border-slate-200 p-4">
+                            <p class="text-sm text-slate-500">Nomor Telepon</p>
+                            <p class="text-lg font-semibold text-slate-800">{{ $data->phone }}</p>
+                        </div>
+                        <div class="rounded-lg border border-slate-200 p-4">
+                            <p class="text-sm text-slate-500">Alamat</p>
+                            <p class="text-lg font-semibold text-slate-800">{{ $data->address }}</p>
                         </div>
                         @break
                 @endswitch

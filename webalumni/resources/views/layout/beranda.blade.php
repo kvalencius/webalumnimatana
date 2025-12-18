@@ -5,7 +5,7 @@
     <div class="left-content show-up header-text wow fadeInLeft" data-wow-duration="1s" data-wow-delay="1s">
       <div class="col-lg-6">
       <h2>Selamat Datang para Alumni Matana</h2>
-      <p>Website ini dirancang untuk menghubungkan mahasiswa aktif, alumni dan dosen Matana.</p>
+      <p>Website ini dirancang untuk menghubungkan para alumni Matana.</p>
       </div>
       @guest
       <div class="white-button first-button scroll-to-section">
