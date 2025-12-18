@@ -54,7 +54,7 @@
             <h4>Forum</h4>
             <p>Diskusikan berbagai topik dan berbagi informasi dengan mahasiswa aktif dan dosen-dosen matana.</p>
             <div class="text-button">
-              <a href="#">Selengkapnya<i class="fa fa-arrow-right"></i></a>
+              <a href="/forum">Selengkapnya<i class="fa fa-arrow-right"></i></a>
             </div>
           </div>
         

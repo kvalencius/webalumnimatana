@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Session;
 use App\Models\User;
@@ -29,7 +30,13 @@ class AuthController extends Controller
             
             // Redirect based on role and data completion
             if (!$user->data_completed) {
-                return redirect()->route('data.form', ['role' => $user->role]);
+                if ($user->role === 'alumni') {
+                    return redirect()->route('alumni.create');
+                } elseif ($user->role === 'student') {
+                    return redirect()->route('student.create');
+                } elseif ($user->role === 'teacher') {
+                    return redirect()->route('teacher.create');
+                }
             }
             return redirect()->intended('/profil');
         }
@@ -67,7 +74,7 @@ class AuthController extends Controller
         ]);
 
         Auth::login($user);
-        return redirect()->route('data.form', ['role' => $user->role]);
+        return redirect()->route('alumni.create', ['role' => $user->role]);
     }
 
     // Tampilkan form pengumpulan data sesuai role
@@ -144,11 +151,11 @@ class AuthController extends Controller
         $data = null;
 
         if ($user->role === 'alumni') {
-            $data = Alumni::where('user_id', $user->id)->first();
+            $data = Alumni::with('tracerStudy')->find($user->id);
         } elseif ($user->role === 'student') {
-            $data = Student::where('user_id', $user->id)->first();
+            $data = Student::find($user->id);
         } elseif ($user->role === 'teacher') {
-            $data = Teacher::where('user_id', $user->id)->first();
+            $data = Teacher::find($user->id);
         }
 
         return view('user.profil', compact('user', 'data'));
@@ -170,7 +177,6 @@ class AuthController extends Controller
         if ($user->profile_picture && Storage::exists('public/' . $user->profile_picture)) {
             Storage::delete('public/' . $user->profile_picture);
         }
-
         $path = $request->file('profile_picture')->store('profile_pictures', 'public');
         $user->update(['profile_picture' => $path]);
 

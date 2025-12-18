@@ -20,6 +20,12 @@
     position: relative;
     z-index: 10;
   }
+
+  .container-footer {
+    padding: 40px;
+    border-radius: 8px;
+    color: white;
+  }
 </style>
 
 <div class="page-background-fixed"></div>
@@ -32,7 +38,7 @@
     <div class="col-lg-3 footer-widget">
       <img src="assets/images/logo-horizontal-white-footer.png"
         alt="Matana University"
-        class="h-12 mb-6"/>
+        class="mb-6"/>
       <p>
         <i class="fas fa-map-marker-alt"></i>
         <a href="https://maps.app.goo.gl/6P3uNLuaX7KJYjEH6">

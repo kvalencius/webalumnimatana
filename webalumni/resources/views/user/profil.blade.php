@@ -11,6 +11,29 @@
         <div class="mb-4 rounded-lg bg-red-100 p-4 text-sm text-red-800">{{ session('error') }}</div>
     @endif
 
+    <!-- Tracer Study Alert for Alumni -->
+    @if($user->role === 'alumni')
+        @php
+            $hasTracerStudy = $user->alumni && $user->alumni->tracerStudy;
+        @endphp
+        @if(!$hasTracerStudy)
+            <div class="mb-4 rounded-lg bg-warning border border-warning p-4 text-sm text-dark">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <strong><i class="fas fa-exclamation-circle"></i> Penting!</strong>
+                        <p class="mb-0 mt-1">Anda belum mengisi Tracer Study. Tracer Study adalah survei wajib untuk melacak perkembangan karir Anda sebagai alumni. Silahkan isi sekarang.</p>
+                    </div>
+                    <a href="{{ route('tracer.form') }}" class="btn btn-warning btn-sm ms-3 flex-shrink-0">Isi Tracer Study</a>
+                </div>
+            </div>
+        @else
+            <div class="mb-4 rounded-lg bg-success border border-success p-4 text-sm text-dark">
+                <strong><i class="fas fa-check-circle"></i> Tracer Study Selesai</strong>
+                <p class="mb-0 mt-1">Anda telah menyelesaikan Tracer Study pada {{ $hasTracerStudy->survey_date->format('d/m/Y') }}. <a href="{{ route('tracer.form') }}" class="text-decoration-none">Ubah jawaban</a></p>
+            </div>
+        @endif
+    @endif
+
     <!-- Profile Picture Section -->
     <div class="text-center mb-8">
         <div class="mb-4">
@@ -85,6 +108,13 @@
             <div class="space-y-4">
                 @switch($user->role)
                     @case('alumni')
+                        <div class="flex justify-between items-center mb-4">
+                            <h4 class="text-lg font-bold text-slate-800">Data Alumni</h4>
+                            <a href="{{ route('alumni.edit', $data->user_id) }}" class="btn btn-sm btn-primary">
+                                <i class="fas fa-edit"></i> Edit
+                            </a>
+                        </div>
+                        
                         <div class="rounded-lg border border-slate-200 p-4">
                             <p class="text-sm text-slate-500">NIM</p>
                             <p class="text-lg font-semibold text-slate-800">{{ $data->nim }}</p>
@@ -121,6 +151,139 @@
                             <div class="rounded-lg border border-slate-200 p-4">
                                 <p class="text-sm text-slate-500">Posisi</p>
                                 <p class="text-lg font-semibold text-slate-800">{{ $data->job_position }}</p>
+                            </div>
+                        @endif
+                        
+                        <!-- Tracer Study Data Section -->
+                        @php
+                            $tracerStudy = $user->alumni && $user->alumni->tracerStudy ? $user->alumni->tracerStudy : null;
+                        @endphp
+                        @if($tracerStudy)
+                            <div class="mt-8 border-t border-slate-200 pt-6">
+                                <h4 class="text-lg font-bold text-slate-800 mb-4">
+                                    <i class="fas fa-chart-line"></i> Data Tracer Study
+                                </h4>
+                                
+                                <div class="rounded-lg border border-blue-200 bg-blue-50 p-4 mb-4">
+                                    <p class="text-sm text-blue-600">Tanggal Survei</p>
+                                    <p class="text-lg font-semibold text-blue-900">{{ $tracerStudy->survey_date->format('d F Y') }}</p>
+                                </div>
+
+                                <div class="space-y-4">
+                                    <!-- Status Pekerjaan -->
+                                    <div class="rounded-lg border border-slate-200 p-4">
+                                        <p class="text-sm text-slate-500">Status Pekerjaan</p>
+                                        <p class="text-lg font-semibold text-slate-800">
+                                            @switch($tracerStudy->status)
+                                                @case('bekerja_full_time')
+                                                    Bekerja Full Time
+                                                    @break
+                                                @case('bekerja_part_time')
+                                                    Bekerja Part Time
+                                                    @break
+                                                @case('wiraswasta')
+                                                    Wiraswasta
+                                                    @break
+                                                @case('lanjut_pendidikan')
+                                                    Lanjut Pendidikan
+                                                    @break
+                                                @case('tidak_kerja_sedang_cari')
+                                                    Tidak Bekerja (Sedang Cari)
+                                                    @break
+                                                @case('belum_memungkinkan_kerja')
+                                                    Belum Memungkinkan Bekerja
+                                                    @break
+                                            @endswitch
+                                        </p>
+                                    </div>
+
+                                    <!-- Perusahaan (jika bekerja) -->
+                                    @if($tracerStudy->current_company)
+                                        <div class="rounded-lg border border-slate-200 p-4">
+                                            <p class="text-sm text-slate-500">Perusahaan / Institusi</p>
+                                            <p class="text-lg font-semibold text-slate-800">{{ $tracerStudy->current_company }}</p>
+                                        </div>
+                                    @endif
+
+                                    <!-- Posisi (jika bekerja) -->
+                                    @if($tracerStudy->current_position)
+                                        <div class="rounded-lg border border-slate-200 p-4">
+                                            <p class="text-sm text-slate-500">Posisi / Jabatan</p>
+                                            <p class="text-lg font-semibold text-slate-800">{{ $tracerStudy->current_position }}</p>
+                                        </div>
+                                    @endif
+
+                                    <!-- Sumber Pendanaan -->
+                                    <div class="rounded-lg border border-slate-200 p-4">
+                                        <p class="text-sm text-slate-500">Sumber Pendanaan</p>
+                                        <p class="text-lg font-semibold text-slate-800">
+                                            @switch($tracerStudy->funding_source)
+                                                @case('biaya_sendiri')
+                                                    Biaya Sendiri
+                                                    @break
+                                                @case('beasiswa_adik')
+                                                    Beasiswa ADIK
+                                                    @break
+                                                @case('beasiswa_bidikmisi')
+                                                    Beasiswa Bidikmisi
+                                                    @break
+                                                @case('beasiswa_ppa')
+                                                    Beasiswa PPA
+                                                    @break
+                                                @case('beasiswa_afirmasi')
+                                                    Beasiswa Afirmasi
+                                                    @break
+                                                @case('beasiswa_swasta')
+                                                    Beasiswa Swasta
+                                                    @break
+                                                @case('lainnya')
+                                                    Lainnya
+                                                    @break
+                                            @endswitch
+                                        </p>
+                                    </div>
+
+                                    <!-- Rating Scales -->
+                                    <div class="rounded-lg border border-purple-200 bg-purple-50 p-4">
+                                        <h5 class="font-bold text-purple-900 mb-3">Penilaian Kualitas Pembelajaran</h5>
+                                        <div class="space-y-3">
+                                            <div class="flex justify-between items-center">
+                                                <span class="text-sm text-purple-700">Perkuliahan & Metode Pengajaran</span>
+                                                <span class="font-semibold text-purple-900">{{ $tracerStudy->f21_perkuliahan ?? '-' }}/5</span>
+                                            </div>
+                                            <div class="flex justify-between items-center">
+                                                <span class="text-sm text-purple-700">Demonstrasi / Praktik Langsung</span>
+                                                <span class="font-semibold text-purple-900">{{ $tracerStudy->f22_demonstrasi ?? '-' }}/5</span>
+                                            </div>
+                                            <div class="flex justify-between items-center">
+                                                <span class="text-sm text-purple-700">Riset dan Project-Based Learning</span>
+                                                <span class="font-semibold text-purple-900">{{ $tracerStudy->f23_riset_project ?? '-' }}/5</span>
+                                            </div>
+                                            <div class="flex justify-between items-center">
+                                                <span class="text-sm text-purple-700">Program Magang & Pengalaman Kerja</span>
+                                                <span class="font-semibold text-purple-900">{{ $tracerStudy->f24_magang ?? '-' }}/5</span>
+                                            </div>
+                                            <div class="flex justify-between items-center">
+                                                <span class="text-sm text-purple-700">Praktikum dan Laboratorium</span>
+                                                <span class="font-semibold text-purple-900">{{ $tracerStudy->f25_praktikum ?? '-' }}/5</span>
+                                            </div>
+                                            <div class="flex justify-between items-center">
+                                                <span class="text-sm text-purple-700">Kerja Lapangan dan Study Tour</span>
+                                                <span class="font-semibold text-purple-900">{{ $tracerStudy->f26_kerja_lapangan ?? '-' }}/5</span>
+                                            </div>
+                                            <div class="flex justify-between items-center">
+                                                <span class="text-sm text-purple-700">Diskusi dan Interaksi Akademik</span>
+                                                <span class="font-semibold text-purple-900">{{ $tracerStudy->f27_diskusi ?? '-' }}/5</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="mt-4">
+                                    <a href="{{ route('tracer.form') }}" class="text-sm text-indigo-600 hover:text-indigo-500 font-semibold">
+                                        <i class="fas fa-edit"></i> Edit Tracer Study
+                                    </a>
+                                </div>
                             </div>
                         @endif
                         @break
@@ -166,5 +329,4 @@
     </div>
 </div>
 
-@include('layout.footer')
 @endsection
