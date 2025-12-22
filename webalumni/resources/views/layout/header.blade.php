@@ -12,17 +12,17 @@
 
           <!-- ***** Menu Start ***** -->
           <ul class="nav">
-            <li class="scroll-to-section"><a href="/" class="active">Home</a></li>
-            <li class="scroll-to-section"><a href="/jobs">Job Vacancy</a></li>
-            <li class="scroll-to-section"><a href="/forum">Forum</a></li>
+            <li class="scroll-to-section"><a href="/" class="active">Beranda</a></li>
+            <li class="scroll-to-section"><a href="/tentang">Tentang Kami</a></li>
+            <li class="scroll-to-section"><a href="/berita">Berita</a></li>
+            <li class="scroll-to-section"><a href="/lowongan">Lowongan Pekerjaan</a></li>
+            <li class="scroll-to-section"><a href="/events">Events</a></li>
+            <li class="scroll-to-section"><a href="/kontak">Kontak Kami</a></li>
             @auth
-              <li class="scroll-to-section"><a href="/profil">Profil</a></li>
-              <li class="scroll-to-section"><a href="/lists">List</a></li>
-              <li></li>
+              <li class="scroll-to-section"><a href="/dashboard">Dashboard</a></li>
+              <li class="scroll-to-section"><a href="/logout">Logout</a></li>
             @else
-              <li class="scroll-to-section"><a href="/profil">Profil</a></li>
-              <li class="scroll-to-section"><a href="/lists">List</a></li>
-              <li></li>            
+              <li class="scroll-to-section"><a href="/login">Login</a></li>
             @endauth
           </ul>
           

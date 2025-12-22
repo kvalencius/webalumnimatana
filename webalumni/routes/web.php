@@ -3,7 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AlumniController;
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\ForumController;
+use App\Http\Controllers\HomeController;
 use App\Http\Controllers\TracerStudyController;
 use App\Http\Controllers\JobVacancyController;
 use App\Http\Controllers\PeopleController;
@@ -20,11 +20,13 @@ use Illuminate\Container\Attributes\DB;
 |
 */
 
-Route::get('/', function () {
-    return view('layout.beranda');
-});
-
-Route::get('/forum', [ForumController::class, 'index'])->name('forum')->middleware('auth');
+// PUBLIC PAGES
+Route::get('/', [HomeController::class, 'index'])->name('home');
+Route::get('/tentang', [HomeController::class, 'tentang'])->name('tentang');
+Route::get('/berita', [HomeController::class, 'berita'])->name('berita');
+Route::get('/lowongan', [JobVacancyController::class, 'index'])->name('lowongan');
+Route::get('/events', [HomeController::class, 'events'])->name('events');
+Route::get('/kontak', [HomeController::class, 'kontak'])->name('kontak');
 
 // Public listing: mahasiswa aktif dan alumni
 Route::get('/lists', [PeopleController::class, 'index'])->name('lists.index');
