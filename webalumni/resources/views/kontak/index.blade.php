@@ -1,34 +1,25 @@
-@extends('layout.layout')
-@section('content')
+@extends('layout.layout_public')
 
-<div class="container mt-5">
-    <div class="row">
-        <div class="col-lg-8">
-            <h1>📞 Kontak Kami</h1>
-            <p>Hubungi kami untuk pertanyaan, saran, atau feedback tentang website alumni.</p>
-            
-            <form action="/api/contact" method="POST" class="mt-4">
-                @csrf
-                <div class="mb-3">
-                    <label for="name" class="form-label">Nama</label>
-                    <input type="text" class="form-control" id="name" name="name" required>
-                </div>
-                <div class="mb-3">
-                    <label for="email" class="form-label">Email</label>
-                    <input type="email" class="form-control" id="email" name="email" required>
-                </div>
-                <div class="mb-3">
-                    <label for="subject" class="form-label">Subjek</label>
-                    <input type="text" class="form-control" id="subject" name="subject" required>
-                </div>
-                <div class="mb-3">
-                    <label for="message" class="form-label">Pesan</label>
-                    <textarea class="form-control" id="message" name="message" rows="5" required></textarea>
-                </div>
-                <button type="submit" class="btn btn-primary">Kirim Pesan</button>
-            </form>
-        </div>
+@section('isiWebsite')
+<!-- Breadcrumb & Title -->
+<div class="breadcrumb-section" style="background-color: #1e3a5f; color: white; padding: 30px 0;">
+    <div class="container">
+        <small style="color: #ff9a56;">
+            <a href="/" style="color: white; text-decoration: none;">Home</a> | <span style="color: #ff9a56;">Kontak Kami</span>
+        </small>
+        <h1 style="font-size: 2.5rem; font-weight: bold; margin: 10px 0 0 0;">Kontak Kami</h1>
     </div>
 </div>
 
+<!-- Main Content -->
+<div class="container mt-5 mb-5" style="text-align: center; padding: 60px 20px;">
+    <h2 style="color: #1e3a5f; font-weight: bold; margin-bottom: 30px;">Hubungi Kami</h2>
+    <p style="color: #666; margin-bottom: 40px; font-size: 1.1rem;">
+        Silahkan hubungi kami melalui informasi yang tersedia di footer atau lewat social media kami.
+    </p>
+    
+    <div style="max-width: 500px; margin: 0 auto;">
+        <img src="{{ asset('assets/images/service.webp') }}" class="img-fluid" alt="Customer Service Illustration" style="width: 100%; height: auto; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+    </div>
+</div>
 @endsection
