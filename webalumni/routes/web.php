@@ -24,9 +24,9 @@ use Illuminate\Container\Attributes\DB;
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/tentang', [HomeController::class, 'tentang'])->name('tentang');
 Route::get('/berita', [HomeController::class, 'berita'])->name('berita');
+Route::get('/berita/{id}', [HomeController::class, 'show_post'])->name('berita.show');
 Route::get('/lowongan', [JobVacancyController::class, 'index'])->name('lowongan');
 Route::get('/events', [HomeController::class, 'events'])->name('events');
-Route::get('/kontak', [HomeController::class, 'kontak'])->name('kontak');
 
 // Public listing: mahasiswa aktif dan alumni
 Route::get('/lists', [PeopleController::class, 'index'])->name('lists.index');

@@ -17,13 +17,6 @@
             <li class="scroll-to-section"><a href="/berita">Berita</a></li>
             <li class="scroll-to-section"><a href="/lowongan">Lowongan Pekerjaan</a></li>
             <li class="scroll-to-section"><a href="/events">Events</a></li>
-            <li class="scroll-to-section"><a href="/kontak">Kontak Kami</a></li>
-            @auth
-              <li class="scroll-to-section"><a href="/dashboard">Dashboard</a></li>
-              <li class="scroll-to-section"><a href="/logout">Logout</a></li>
-            @else
-              <li class="scroll-to-section"><a href="/login">Login</a></li>
-            @endauth
           </ul>
           
           {{-- 
