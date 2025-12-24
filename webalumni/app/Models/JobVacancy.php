@@ -22,7 +22,8 @@ class JobVacancy extends Model
         'gaji_max',
         'kontak_email',
         'kontak_phone',
-        'created_by', // ADMIN
+        'poster',     // TAMBAHKAN INI agar gambar bisa tersimpan
+        'posted_by',   // Sesuaikan dengan yang digunakan di Controller (Auth::id())
     ];
 
     protected $casts = [
@@ -35,12 +36,23 @@ class JobVacancy extends Model
     // ======================
     public function creator()
     {
-        return $this->belongsTo(User::class, 'created_by');
+        // Sesuaikan foreign key dengan 'posted_by'
+        return $this->belongsTo(User::class, 'posted_by');
     }
 
     // ======================
     // ACCESSORS
     // ======================
+    
+    // Accessor untuk mempermudah pemanggilan URL Gambar
+    public function getPosterUrlAttribute()
+    {
+        if ($this->poster) {
+            return asset('storage/' . $this->poster);
+        }
+        return null; // Atau kembalikan URL gambar default jika tidak ada poster
+    }
+
     public function getFormattedGajiAttribute()
     {
         if ($this->gaji_min && $this->gaji_max) {

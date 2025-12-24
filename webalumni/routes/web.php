@@ -7,7 +7,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\TracerStudyController;
 use App\Http\Controllers\JobVacancyController;
 use App\Http\Controllers\PeopleController;
-
+use App\Http\Controllers\AdminController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -80,20 +80,28 @@ Route::middleware(['auth'])->group(function () {
 // ADMIN - KELOLA LOWONGAN KERJA
 // (CRUD - Create, Read, Update, Delete)
 // =======================
+// Update bagian route admin Anda
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
     
-    // List semua lowongan untuk admin
+    // 1. Dashboard Utama (Sesuai Controller yang Anda buat)
+    Route::get('/dashboard', [AdminController::class, 'adminDashboard'])->name('dashboard'); //
+
+    // 2. Data Master (Fakultas & Jurusan) - Sesuai rencana Menu
+    Route::get('/fakultas', [AdminController::class, 'fakultasIndex'])->name('fakultas.index');
+    Route::get('/jurusan', [AdminController::class, 'jurusanIndex'])->name('jurusan.index');
+
+    // 3. Manajemen Alumni & Verifikasi
+    Route::get('/alumni-data', [AdminController::class, 'alumniData'])->name('alumni.index');
+    Route::get('/verifikasi', [AdminController::class, 'verifikasiIndex'])->name('verifikasi.index');
+    Route::post('/verifikasi/{id}/approve', [AdminController::class, 'approveAlumni'])->name('verifikasi.approve');
+    Route::post('/verifikasi/{id}/reject', [AdminController::class, 'rejectAlumni'])->name('verifikasi.reject');
+
+    // --- Route Lowongan Kerja yang sudah ada tetap di sini ---
     Route::get('/lowongan', [JobVacancyController::class, 'adminIndex'])->name('jobs.index');
-    
-    // Create lowongan baru
     Route::get('/lowongan/create', [JobVacancyController::class, 'create'])->name('jobs.create');
     Route::post('/lowongan', [JobVacancyController::class, 'store'])->name('jobs.store');
-    
-    // Edit & Update lowongan
     Route::get('/lowongan/{id}/edit', [JobVacancyController::class, 'edit'])->name('jobs.edit');
     Route::put('/lowongan/{id}', [JobVacancyController::class, 'update'])->name('jobs.update');
-    
-    // Delete lowongan
     Route::delete('/lowongan/{id}', [JobVacancyController::class, 'destroy'])->name('jobs.destroy');
 });
 

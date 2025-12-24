@@ -181,8 +181,8 @@
                 <div class="col-xl-3 col-lg-4 col-md-6">
                     <a href="{{ url('lowongan/'.$job->id) }}" class="card-lowongan">
                         <div class="image-box">
-                            @if($job->poster_image)
-                                <img src="{{ asset('storage/'.$job->poster_image) }}" alt="Poster">
+                            @if($job->poster) 
+                                <img src="{{ asset('storage/'.$job->poster) }}" alt="Poster">
                             @else
                                 <div class="d-flex h-100 align-items-center justify-content-center text-muted">
                                     <span>No Poster</span>

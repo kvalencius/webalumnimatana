@@ -5,29 +5,21 @@ namespace App\Http\Controllers;
 use App\Models\JobVacancy;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class JobVacancyController extends Controller
 {
     public function __construct()
     {
-        // Semua method butuh auth
         $this->middleware('auth');
-        
-        // Hanya admin yang bisa akses method selain index dan show
         $this->middleware('role:admin')->except(['index', 'show']);
     }
 
-    /**
-     * =========================
-     * PUBLIK (Mahasiswa & Alumni)
-     * Hanya bisa LIHAT saja
-     * =========================
-     */
+    // ================= PUBLIC =================
     public function index(Request $request)
     {
         $query = JobVacancy::latest();
 
-        // Filter pencarian
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function ($q) use ($search) {
@@ -37,7 +29,6 @@ class JobVacancyController extends Controller
             });
         }
 
-        // Filter lokasi
         if ($request->filled('lokasi')) {
             $query->where('lokasi', 'like', "%{$request->lokasi}%");
         }
@@ -54,12 +45,7 @@ class JobVacancyController extends Controller
         return view('job_vacancies.show', compact('job'));
     }
 
-    /**
-     * =========================
-     * ADMIN - Kelola Lowongan
-     * Bisa CRUD (Create, Read, Update, Delete)
-     * =========================
-     */
+    // ================= ADMIN =================
     public function adminIndex()
     {
         $jobs = JobVacancy::latest()->paginate(15);
@@ -70,31 +56,31 @@ class JobVacancyController extends Controller
     {
         return view('admin.job_vacancies.create');
     }
+public function store(Request $request)
+{
+    $validated = $request->validate([
+        'judul'          => 'required|string|max:200',
+        'perusahaan'     => 'required|string|max:150',
+        'tipe_pekerjaan' => 'required',
+        'lokasi'         => 'required|string|max:100',
+        'deskripsi'      => 'required|string',
+        'persyaratan'    => 'nullable|string',
+        'poster'         => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+    ]);
 
-    public function store(Request $request)
-    {
-        $validated = $request->validate([
-            'judul' => 'required|string|max:200',
-            'perusahaan' => 'required|string|max:150',
-            'tipe_pekerjaan' => 'required|in:full_time,part_time,internship,contract,freelance',
-            'lokasi' => 'required|string|max:100',
-            'deskripsi' => 'required|string',
-            'persyaratan' => 'nullable|string',
-            'gaji_min' => 'nullable|numeric|min:0',
-            'gaji_max' => 'nullable|numeric|min:0|gte:gaji_min',
-            'kontak_email' => 'nullable|email|max:100',
-            'kontak_phone' => 'nullable|string|max:20',
-        ]);
+    $validated['posted_by'] = Auth::id();
 
-        // Admin langsung publish, tidak perlu approval
-        JobVacancy::create(array_merge($validated, [
-            'posted_by' => Auth::id(),
-        ]));
-
-        return redirect()
-            ->route('admin.jobs.index')
-            ->with('success', 'Lowongan berhasil dipublish.');
+    if ($request->hasFile('poster')) {
+        $validated['poster'] = $request->file('poster')->store('posters', 'public');
     }
+
+    JobVacancy::create($validated);
+
+    return redirect()
+        ->route('admin.jobs.index')
+        ->with('success', 'Lowongan berhasil dipublish.');
+}
+
 
     public function edit($id)
     {
@@ -107,17 +93,30 @@ class JobVacancyController extends Controller
         $job = JobVacancy::findOrFail($id);
 
         $validated = $request->validate([
-            'judul' => 'required|string|max:200',
-            'perusahaan' => 'required|string|max:150',
+            'judul'          => 'required|string|max:200',
+            'perusahaan'     => 'required|string|max:150',
             'tipe_pekerjaan' => 'required|in:full_time,part_time,internship,contract,freelance',
-            'lokasi' => 'required|string|max:100',
-            'deskripsi' => 'required|string',
-            'persyaratan' => 'nullable|string',
-            'gaji_min' => 'nullable|numeric|min:0',
-            'gaji_max' => 'nullable|numeric|min:0|gte:gaji_min',
-            'kontak_email' => 'nullable|email|max:100',
-            'kontak_phone' => 'nullable|string|max:20',
+            'lokasi'         => 'required|string|max:100',
+            'deskripsi'      => 'required|string',
+            'persyaratan'    => 'nullable|string',
+            'poster'         => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'gaji_min'       => 'nullable|numeric|min:0',
+            'gaji_max'       => 'nullable|numeric|min:0|gte:gaji_min',
+            'kontak_email'   => 'nullable|email|max:100',
+            'kontak_phone'   => 'nullable|string|max:20',
         ]);
+
+        // 🔥 PENTING: jangan set poster ke NULL
+        if ($request->hasFile('poster')) {
+            if ($job->poster && Storage::disk('public')->exists($job->poster)) {
+                Storage::disk('public')->delete($job->poster);
+            }
+
+            $validated['poster'] =
+                $request->file('poster')->store('posters', 'public');
+        } else {
+            unset($validated['poster']); // INI KUNCINYA
+        }
 
         $job->update($validated);
 
@@ -128,8 +127,14 @@ class JobVacancyController extends Controller
 
     public function destroy($id)
     {
-        JobVacancy::findOrFail($id)->delete();
-        
+        $job = JobVacancy::findOrFail($id);
+
+        if ($job->poster && Storage::disk('public')->exists($job->poster)) {
+            Storage::disk('public')->delete($job->poster);
+        }
+
+        $job->delete();
+
         return redirect()
             ->route('admin.jobs.index')
             ->with('success', 'Lowongan berhasil dihapus.');
