@@ -33,7 +33,7 @@ class JobVacancyController extends Controller
             $query->where('lokasi', 'like', "%{$request->lokasi}%");
         }
 
-        $jobs = $query->paginate(12);
+        $jobs = $query->paginate(3);
         $locations = JobVacancy::distinct()->pluck('lokasi');
 
         return view('job_vacancies.index', compact('jobs', 'locations'));

@@ -17,21 +17,27 @@
 </head>
 <body>
     <div class="sidebar">
-        <div class="p-4 text-center">
-            <h5 class="fw-bold">ALUMNI MATANA</h5>
-            <hr>
-        </div>
-        <a href="{{ route('admin.dashboard') }}" class="active"><i class="fas fa-home me-2"></i> Dashboard</a>
-        <div class="px-3 py-2 small text-uppercase opacity-50">Data Master</div>
-        <a href="#"><i class="fas fa-university me-2"></i> Fakultas</a>
-        <a href="#"><i class="fas fa-graduation-cap me-2"></i> Jurusan</a>
-        <div class="px-3 py-2 small text-uppercase opacity-50">Alumni</div>
-        <a href="#"><i class="fas fa-users me-2"></i> Data Alumni</a>
-        <a href="#"><i class="fas fa-check-circle me-2"></i> Verifikasi</a>
-        <div class="px-3 py-2 small text-uppercase opacity-50">Content</div>
-        <a href="#"><i class="fas fa-newspaper me-2"></i> Berita / Event</a>
-        <a href="{{ route('admin.jobs.index') }}"><i class="fas fa-briefcase me-2"></i> Lowongan Kerja</a>
+    <div class="p-4 text-center">
+        <h5 class="fw-bold">ALUMNI MATANA</h5>
+        <hr>
     </div>
+    
+    <a href="{{ route('admin.dashboard') }}" class="{{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
+        <i class="fas fa-home me-2"></i> Dashboard
+    </a>
+
+    <div class="px-3 py-2 small text-uppercase opacity-50">Data Master</div>
+    <a href="#"><i class="fas fa-graduation-cap me-2"></i> Jurusan</a>
+
+    <div class="px-3 py-2 small text-uppercase opacity-50">Alumni</div>
+    <a href="#"><i class="fas fa-users me-2"></i> Data Alumni</a>
+    
+    <div class="px-3 py-2 small text-uppercase opacity-50">Content</div>
+    <a href="#"><i class="fas fa-newspaper me-2"></i> Berita / Event</a>
+    <a href="{{ route('admin.jobs.index') }}" class="{{ request()->routeIs('admin.jobs.index') ? 'active' : '' }}">
+        <i class="fas fa-briefcase me-2"></i> Lowongan Kerja
+    </a>
+</div>
 
     <div class="main-content">
         @yield('admin_content')

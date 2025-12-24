@@ -10,35 +10,34 @@ return new class extends Migration
      * Run the migrations.
      */
     public function up(): void
-    {
-        Schema::table('alumni', function (Blueprint $table) {
-            if (!Schema::hasColumn('alumni', 'graduation_year')) {
-                $table->string('graduation_year')->nullable();
-            }
-            if (!Schema::hasColumn('alumni', 'major')) {
-                $table->string('major')->nullable();
-            }
-            if (!Schema::hasColumn('alumni', 'phone')) {
-                $table->string('phone')->nullable();
-            }
-        });
-    }
+{
+    Schema::table('alumni', function (Blueprint $table) {
+        if (!Schema::hasColumn('alumni', 'graduation_year')) {
+            $table->string('graduation_year')->nullable();
+        }
+        if (!Schema::hasColumn('alumni', 'major')) {
+            $table->string('major')->nullable();
+        }
+        if (!Schema::hasColumn('alumni', 'phone')) {
+            $table->string('phone')->nullable();
+        }
+        // TAMBAHKAN INI: Kolom untuk verifikasi di dashboard
+        if (!Schema::hasColumn('alumni', 'status')) {
+            $table->string('status')->default('pending'); 
+        }
+    });
+}
 
-    /**
-     * Reverse the migrations.
-     */
-    public function down(): void
-    {
-        Schema::table('alumni', function (Blueprint $table) {
-            if (Schema::hasColumn('alumni', 'graduation_year')) {
-                $table->dropColumn('graduation_year');
+public function down(): void
+{
+    Schema::table('alumni', function (Blueprint $table) {
+        // Tambahkan juga dropColumn agar bisa di-rollback
+        $columns = ['graduation_year', 'major', 'phone', 'status'];
+        foreach($columns as $col) {
+            if (Schema::hasColumn('alumni', $col)) {
+                $table->dropColumn($col);
             }
-            if (Schema::hasColumn('alumni', 'major')) {
-                $table->dropColumn('major');
-            }
-            if (Schema::hasColumn('alumni', 'phone')) {
-                $table->dropColumn('phone');
-            }
-        });
-    }
+        }
+    });
+}
 };

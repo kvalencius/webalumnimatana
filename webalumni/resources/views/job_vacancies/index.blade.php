@@ -152,13 +152,56 @@
     .pagination .page-item.active .page-link {
         background-color: #00a1e4 !important;
     }
+    /* Mengatur agar nomor halaman berjajar ke samping (Horizontal) */
+.custom-pagination ul.pagination {
+    display: flex !important;
+    list-style: none !important;
+    padding: 0 !important;
+    margin: 30px 0 !important;
+    justify-content: center !important;
+    gap: 8px !important;
+}
+
+/* Mengatur ukuran dan bentuk tombol nomor */
+.custom-pagination .page-item .page-link {
+    width: 45px !important;
+    height: 45px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-radius: 10px !important;
+    border: 1px solid #dee2e6 !important;
+    color: #002d72 !important;
+    font-weight: 700 !important;
+    text-decoration: none !important;
+    background-color: white !important;
+    transition: 0.3s !important;
+}
+
+/* Warna saat tombol aktif (seperti BSI) */
+.custom-pagination .page-item.active .page-link {
+    background-color: #00a1e4 !important;
+    color: white !important;
+    border-color: #00a1e4 !important;
+}
+
+/* Memperkecil ikon panah (SVG) agar tidak raksasa */
+.custom-pagination svg {
+    width: 16px !important;
+    height: 16px !important;
+}
+
+/* Menghilangkan teks "Showing X to Y of Z results" yang berantakan */
+.custom-pagination nav div:first-child {
+    display: none !important;
+}
 </style>
 
 <div class="lowongan-page-wrapper">
     <header class="header-bsi-style">
         <div class="container text-center">
             <h1 class="fw-800 text-white display-5">Lowongan Kerja</h1>
-            <p class="text-white-50">Temukan karir impian Anda bersama mitra perusahaan kami</p>
+            <p class="text-white-50">Halaman lowongan Pekerjaan</p>
         </div>
     </header>
 
@@ -204,9 +247,12 @@
             </div>
 
             <div class="custom-pagination">
-                {{ $jobs->appends(request()->input())->links('pagination::bootstrap-4') }}
-            </div>
-        </div>
+    @if ($jobs->hasPages())
+        <nav>
+            {{ $jobs->appends(request()->input())->links('pagination::bootstrap-5') }}
+        </nav>
+    @endif
+</div>
     </main>
 </div>
 @endsection
