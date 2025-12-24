@@ -19,8 +19,8 @@ class Post extends Model
         'excerpt',
         'image',
         'video',
-        'likes_count',
         'comments_count',
+        'views_count',
     ];
 
     /**
