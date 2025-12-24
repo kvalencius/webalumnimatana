@@ -12,10 +12,10 @@
 </div>
 
 <!-- Main Content -->
-<div class="container mt-5 mb-5" style="max-width: 100%;">
-    <div class="row g-4" style="display: flex; flex-wrap: wrap;">
+<div class="container mt-5 mb-5">
+    <div class="row g-4" style="display: flex !important; flex-wrap: nowrap !important; width: 100%;">
         <!-- Posts Section -->
-        <div class="col-lg-8" style="flex: 0 0 calc(66.666% - 16px); margin-right: 16px;">
+        <div style="flex: 0 0 66.666%; min-width: 0; padding-right: 16px;">
 
             <!-- Posts Grid -->
             @if($posts->count())
@@ -58,7 +58,7 @@
                                 </li>
                                 <li style="display: flex; align-items: center; gap: 5px;">
                                     <i class="fas fa-eye" style="color: #999;"></i>
-                                    <span style="color: #999; font-size: 0.9rem;">{{ $post->likes_count ?? 0 }}</span>
+                                    <span style="color: #999; font-size: 0.9rem;">{{ $post->views_count ?? 0 }} Views</span>
                                 </li>
                             </ul>
                         </div>
@@ -90,7 +90,7 @@
         </div>
 
         <!-- Sidebar -->
-        <div class="col-lg-4" style="flex: 0 0 calc(33.333%);">
+        <div style="flex: 0 0 33.333%; min-width: 0;">
             <!-- Search Widget -->
             <div class="card shadow-sm mb-4" style="border: none; border-radius: 10px;">
                 <div class="card-body p-4">
@@ -113,7 +113,7 @@
                 </div>
                 <div class="card-body p-0">
                     @forelse($popularPosts as $popular)
-                    <a href="/berita/{{ $popular->id }}" style="text-decoration: none; color: inherit; display: block; padding: 50px; border-bottom: 1px solid #e8e8e8; transition: background 0.2s;" onmouseover="this.style.background='#f9f9f9'" onmouseout="this.style.background=''">
+                    <a href="/berita/{{ $popular->id }}" style="text-decoration: none; color: inherit; display: block; padding: 20px; border-bottom: 1px solid #e8e8e8; transition: background 0.2s;" onmouseover="this.style.background='#f9f9f9'" onmouseout="this.style.background=''">
                         <div style="display: flex; gap: 16px;">
                             <!-- Thumbnail -->
                             <div style="flex-shrink: 0; width: 85px; height: 85px;">
@@ -132,13 +132,14 @@
                                     {{ $popular->title }}
                                 </p>
                                 <small style="color: #aaa; display: block; margin-top: 0; font-size: 0.8rem;">
-                                    <i class="fas fa-calendar" style="font-size: 0.75rem;"></i> {{ $popular->created_at->format('d M y') }}
+                                    <i class="fas fa-eye" style="font-size: 0.75rem;"></i> {{ $popular->views_count ?? 0 }} views
+                                    | <i class="fas fa-calendar" style="font-size: 0.75rem;"></i> {{ $popular->created_at->format('d M y') }}
                                 </small>
                             </div>
                         </div>
                     </a>
                     @empty
-                    <div style="padding: 26px; text-align: center; color: #999;">
+                    <div style="padding: 20px; text-align: center; color: #999;">
                         <p class="mb-0" style="font-size: 0.85rem;">Belum ada berita</p>
                     </div>
                     @endforelse
@@ -152,8 +153,8 @@
                         <i class="fas fa-list"></i> Kategori
                     </h5>
                 </div>
-                <div class="card-body">
-                    <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                <div class="card-body" style="padding: 16px;">
+                    <div style="display: flex; flex-wrap: wrap; gap: 12px;">
                         <a href="/berita" class="badge" style="background-color: {{ !request('category') ? '#1e3a5f' : '#e9ecef' }}; color: {{ !request('category') ? 'white' : '#1e3a5f' }}; text-decoration: none; padding: 8px 12px; border-radius: 20px; cursor: pointer;">
                             Semua
                         </a>
@@ -164,157 +165,6 @@
                         @empty
                         <p class="text-muted mb-0">Tidak ada kategori</p>
                         @endforelse
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-@endsection
-
-@section('isiWebsite')
-<div style="background-color: #f8f9fa; padding: 40px 0;">
-    <div class="container">
-        <div class="row">
-            <!-- Main Content -->
-            <div class="col-lg-8">
-                <!-- Search Bar -->
-                <div class="mb-4">
-                    <form action="{{ route('berita') }}" method="GET" class="d-flex gap-2">
-                        <input type="text" name="search" class="form-control" placeholder="Cari berita..." 
-                               value="{{ request('search') }}" style="border-radius: 8px; border: 1px solid #ddd;">
-                        <button type="submit" class="btn btn-primary" style="background-color: #5b7ec2; border: none; border-radius: 8px;">
-                            <i class="fas fa-search"></i> Cari
-                        </button>
-                    </form>
-                </div>
-
-                <!-- Posts Grid -->
-                <div class="row g-4">
-                    @forelse($posts as $post)
-                    <div class="col-md-6 col-lg-12">
-                        <div class="card h-100" style="border: none; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1); transition: transform 0.3s; cursor: pointer;"
-                             onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 8px 16px rgba(0,0,0,0.15)'"
-                             onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 8px rgba(0,0,0,0.1)'">
-                            <div class="row g-0">
-                                <!-- Thumbnail -->
-                                <div class="col-md-4">
-                                    @if($post->image)
-                                        <img src="{{ asset('storage/' . $post->image) }}" alt="{{ $post->title }}" 
-                                             style="width: 100%; height: 200px; object-fit: cover;">
-                                    @else
-                                        <div style="width: 100%; height: 200px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);"></div>
-                                    @endif
-                                </div>
-
-                                <!-- Content -->
-                                <div class="col-md-8">
-                                    <div class="card-body d-flex flex-column h-100" style="padding: 20px;">
-                                        <!-- Category Badge -->
-                                        @if($post->category)
-                                        <span class="badge" style="background-color: #5b7ec2; width: fit-content; margin-bottom: 10px; border-radius: 20px; padding: 6px 12px; font-size: 0.85rem;">
-                                            {{ $post->category }}
-                                        </span>
-                                        @endif
-
-                                        <!-- Title -->
-                                        <h5 class="card-title" style="font-weight: bold; color: #1a3d5c; margin-bottom: 10px; line-height: 1.4;">
-                                            <a href="{{ route('berita.show', $post->id) }}" style="text-decoration: none; color: inherit;">
-                                                {{ $post->title ?? 'Untitled Post' }}
-                                            </a>
-                                        </h5>
-
-                                        <!-- Excerpt -->
-                                        <p class="card-text" style="color: #666; font-size: 0.95rem; flex-grow: 1; margin-bottom: 15px;">
-                                            {{ $post->excerpt ?? Str::limit($post->content, 100) }}
-                                        </p>
-
-                                        <!-- Meta Info -->
-                                        <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; color: #999; border-top: 1px solid #eee; padding-top: 10px;">
-                                            <span>
-                                                <i class="fas fa-calendar"></i> 
-                                                {{ $post->created_at->format('d M Y') }}
-                                            </span>
-                                            <a href="{{ route('berita.show', $post->id) }}" class="text-primary" style="text-decoration: none; color: #5b7ec2; font-weight: 500;">
-                                                Selengkapnya →
-                                            </a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    @empty
-                    <div class="col-12">
-                        <div class="alert alert-info text-center">
-                            <i class="fas fa-info-circle"></i> Belum ada berita
-                        </div>
-                    </div>
-                    @endforelse
-                </div>
-
-                <!-- Pagination -->
-                @if($posts->hasPages())
-                <nav aria-label="Page navigation" class="mt-5">
-                    <ul class="pagination justify-content-center">
-                        {{ $posts->links('pagination::bootstrap-4') }}
-                    </ul>
-                </nav>
-                @endif
-            </div>
-
-            <!-- Sidebar -->
-            <div class="col-lg-4">
-                <!-- Category Filter -->
-                @if($categories->count() > 0)
-                <div class="card" style="border: none; border-radius: 12px; margin-bottom: 30px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-                    <div class="card-body">
-                        <h5 class="card-title" style="font-weight: bold; color: #1a3d5c; margin-bottom: 15px;">Kategori</h5>
-                        <div class="d-flex flex-column gap-2">
-                            <a href="{{ route('berita') }}" class="btn btn-sm btn-outline-primary" style="border-color: #5b7ec2; color: #5b7ec2; text-decoration: none;">
-                                Semua Kategori
-                            </a>
-                            @foreach($categories as $category)
-                            <a href="{{ route('berita', ['category' => $category]) }}" 
-                               class="btn btn-sm btn-outline-primary" 
-                               style="border-color: #5b7ec2; color: #5b7ec2; text-decoration: none;">
-                                {{ $category }}
-                            </a>
-                            @endforeach
-                        </div>
-                    </div>
-                </div>
-                @endif
-
-                <!-- Popular Posts -->
-                <div class="card" style="border: none; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-                    <div class="card-body">
-                        <h5 class="card-title" style="font-weight: bold; color: #1a3d5c; margin-bottom: 20px;">Berita Terpopuler</h5>
-                        <div class="d-flex flex-column gap-3">
-                            @forelse($popularPosts as $item)
-                            <div style="padding-bottom: 15px; border-bottom: 1px solid #eee;">
-                                <a href="{{ route('berita.show', $item->id) }}" style="text-decoration: none;">
-                                    <div style="display: flex; gap: 10px;">
-                                        @if($item->image)
-                                            <img src="{{ asset('storage/' . $item->image) }}" alt="{{ $item->title }}" 
-                                                 style="width: 60px; height: 60px; object-fit: cover; border-radius: 8px;">
-                                        @else
-                                            <div style="width: 60px; height: 60px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 8px;"></div>
-                                        @endif
-                                        <div style="flex-grow: 1;">
-                                            <p style="font-weight: 500; color: #1a3d5c; margin: 0 0 5px 0; font-size: 0.95rem; line-height: 1.3;">
-                                                {{ $item->title ?? 'Untitled Post' }}
-                                            </p>
-                                            <small style="color: #999;">
-                                                {{ $item->created_at->format('d M Y') }}
-                                            </small>
-                                        </div>
-                                    </div>
-                                </a>
-                            </div>
-                            @empty
-                            @endforelse
-                        </div>
                     </div>
                 </div>
             </div>

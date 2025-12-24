@@ -35,7 +35,7 @@ class HomeController extends Controller
         
         $posts = $query->paginate(12);
         $categories = Post::distinct()->pluck('category')->filter();
-        $popularPosts = Post::latest()->take(5)->get();
+        $popularPosts = Post::orderByDesc('views_count')->take(5)->get();
         
         return view('berita.index', compact('posts', 'categories', 'popularPosts'));
     }
@@ -43,6 +43,10 @@ class HomeController extends Controller
     public function show_post($id)
     {
         $post = Post::with(['user', 'comments'])->findOrFail($id);
+        
+        // Increment views counter
+        $post->increment('views_count');
+        
         $relatedPosts = Post::where('category', $post->category)
                            ->where('id', '!=', $id)
                            ->take(3)
