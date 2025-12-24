@@ -121,3 +121,7 @@ Route::middleware('auth')->group(function () {
     // Teacher resource routes (for future expansion)
     Route::resource('teacher', 'App\Http\Controllers\TeacherController');
 });
+
+Route::get('/admin/dashboard', function () {
+    return view('admin.dashboard');
+});
