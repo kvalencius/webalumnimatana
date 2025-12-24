@@ -10,27 +10,27 @@ return new class extends Migration
     {
         Schema::create('job_vacancies', function (Blueprint $table) {
             $table->id();
-            
-            $table->foreignId('posted_by')->constrained('users')->cascadeOnDelete();
-            $table->foreignId('approved_by')->nullable()->constrained('users')->nullOnDelete();
+
+            // ADMIN YANG MEMPOSTING
+            $table->foreignId('posted_by')
+                  ->constrained('users')
+                  ->cascadeOnDelete();
 
             $table->string('judul');
             $table->string('perusahaan');
             $table->string('tipe_pekerjaan');
             $table->string('lokasi');
+
             $table->text('deskripsi');
             $table->text('persyaratan')->nullable();
-            
+
             $table->decimal('gaji_min', 15, 2)->nullable();
             $table->decimal('gaji_max', 15, 2)->nullable();
-            
+
             $table->string('kontak_email')->nullable();
             $table->string('kontak_phone')->nullable();
 
-            $table->string('status')->default('approved');
-            $table->text('rejection_note')->nullable();
-
-            $table->timestamps(); // ⬅️ INI WAJIB kalau kamu pakai Eloquent biasa
+            $table->timestamps(); // wajib untuk Eloquent
         });
     }
 

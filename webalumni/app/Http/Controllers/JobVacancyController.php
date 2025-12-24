@@ -8,58 +8,69 @@ use Illuminate\Support\Facades\Auth;
 
 class JobVacancyController extends Controller
 {
+    public function __construct()
+    {
+        // Semua method butuh auth
+        $this->middleware('auth');
+        
+        // Hanya admin yang bisa akses method selain index dan show
+        $this->middleware('role:admin')->except(['index', 'show']);
+    }
+
     /**
-     * Tampilkan semua lowongan aktif (Mahasiswa & Alumni)
+     * =========================
+     * PUBLIK (Mahasiswa & Alumni)
+     * Hanya bisa LIHAT saja
+     * =========================
      */
     public function index(Request $request)
     {
-        $query = JobVacancy::where('status', 'approved')
-            ->with('postedBy')
-            ->latest();
+        $query = JobVacancy::latest();
 
-        // Fitur Pencarian
+        // Filter pencarian
         if ($request->filled('search')) {
             $search = $request->search;
-            $query->where(function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->where('judul', 'like', "%{$search}%")
                   ->orWhere('perusahaan', 'like', "%{$search}%")
                   ->orWhere('lokasi', 'like', "%{$search}%");
             });
         }
 
-        // Filter Lokasi
+        // Filter lokasi
         if ($request->filled('lokasi')) {
             $query->where('lokasi', 'like', "%{$request->lokasi}%");
         }
 
         $jobs = $query->paginate(12);
-        
-        // Ambil daftar lokasi unik untuk dropdown filter
         $locations = JobVacancy::distinct()->pluck('lokasi');
 
         return view('job_vacancies.index', compact('jobs', 'locations'));
     }
 
-    /**
-     * Detail Lowongan
-     */
     public function show($id)
     {
-        $job = JobVacancy::with('postedBy')->findOrFail($id);
+        $job = JobVacancy::findOrFail($id);
         return view('job_vacancies.show', compact('job'));
     }
 
     /**
-     * Alumni - Form buat lowongan
+     * =========================
+     * ADMIN - Kelola Lowongan
+     * Bisa CRUD (Create, Read, Update, Delete)
+     * =========================
      */
-    public function create()
+    public function adminIndex()
     {
-        return view('job_vacancies.create');
+        $jobs = JobVacancy::latest()->paginate(15);
+        return view('admin.job_vacancies.index', compact('jobs'));
     }
 
-    /**
-     * Alumni - Simpan dan langsung PUBLISH
-     */
+    public function create()
+    {
+        return view('admin.job_vacancies.create');
+    }
+
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -71,46 +82,29 @@ class JobVacancyController extends Controller
             'persyaratan' => 'nullable|string',
             'gaji_min' => 'nullable|numeric|min:0',
             'gaji_max' => 'nullable|numeric|min:0|gte:gaji_min',
-            'kontak_email' => 'required|email|max:100',
+            'kontak_email' => 'nullable|email|max:100',
             'kontak_phone' => 'nullable|string|max:20',
         ]);
 
-        JobVacancy::create([
-            'judul' => $validated['judul'],
-            'perusahaan' => $validated['perusahaan'],
-            'tipe_pekerjaan' => $validated['tipe_pekerjaan'],
-            'lokasi' => $validated['lokasi'],
-            'deskripsi' => $validated['deskripsi'],
-            'persyaratan' => $validated['persyaratan'] ?? null,
-            'gaji_min' => $validated['gaji_min'] ?? null,
-            'gaji_max' => $validated['gaji_max'] ?? null,
-            'kontak_email' => $validated['kontak_email'],
-            'kontak_phone' => $validated['kontak_phone'] ?? null,
+        // Admin langsung publish, tidak perlu approval
+        JobVacancy::create(array_merge($validated, [
             'posted_by' => Auth::id(),
-            'status' => 'approved' // Langsung aktif tanpa approval
-        ]);
+        ]));
 
-        return redirect()->route('jobs.my-jobs')
-            ->with('success', 'Lowongan berhasil diposting dan sudah aktif!');
+        return redirect()
+            ->route('admin.jobs.index')
+            ->with('success', 'Lowongan berhasil dipublish.');
     }
 
-    /**
-     * Alumni - Form edit lowongan milik sendiri
-     */
     public function edit($id)
     {
-        // Pastikan hanya pemilik yang bisa edit
-        $job = JobVacancy::where('posted_by', Auth::id())->findOrFail($id);
-        
-       return view('job_vacancies.edit', compact('job'));
+        $job = JobVacancy::findOrFail($id);
+        return view('admin.job_vacancies.edit', compact('job'));
     }
 
-    /**
-     * Alumni - Update lowongan
-     */
     public function update(Request $request, $id)
     {
-        $job = JobVacancy::where('posted_by', Auth::id())->findOrFail($id);
+        $job = JobVacancy::findOrFail($id);
 
         $validated = $request->validate([
             'judul' => 'required|string|max:200',
@@ -121,89 +115,23 @@ class JobVacancyController extends Controller
             'persyaratan' => 'nullable|string',
             'gaji_min' => 'nullable|numeric|min:0',
             'gaji_max' => 'nullable|numeric|min:0|gte:gaji_min',
-            'kontak_email' => 'required|email|max:100',
+            'kontak_email' => 'nullable|email|max:100',
             'kontak_phone' => 'nullable|string|max:20',
         ]);
 
         $job->update($validated);
 
-        return redirect()->route('jobs.my-jobs')->with('success', 'Lowongan berhasil diperbarui!');
+        return redirect()
+            ->route('admin.jobs.index')
+            ->with('success', 'Lowongan berhasil diperbarui.');
     }
 
-    /**
-     * Alumni - Hapus lowongan milik sendiri
-     */
     public function destroy($id)
     {
-        $job = JobVacancy::where('posted_by', Auth::id())->findOrFail($id);
-        $job->delete();
-
-        return back()->with('success', 'Lowongan berhasil dihapus!');
-    }
-
-    /**
-     * Alumni - Manajemen lowongan pribadi
-     */
-    public function myJobs()
-    {
-        $jobs = JobVacancy::where('posted_by', Auth::id())
-            ->latest()
-            ->get();
-
-        return view('job_vacancies.my-jobs', compact('jobs'));
-    }
-
-    /**
-     * Alumni - Simpan lowongan dari profil (status pending untuk approval)
-     */
-    public function storeFromProfile(Request $request)
-    {
-        $validated = $request->validate([
-            'judul' => 'required|string|max:200',
-            'perusahaan' => 'required|string|max:150',
-            'tipe_pekerjaan' => 'required|in:full_time,part_time,internship,contract,freelance',
-            'lokasi' => 'required|string|max:100',
-            'deskripsi' => 'required|string',
-            'persyaratan' => 'nullable|string',
-            'gaji_min' => 'nullable|numeric|min:0',
-            'gaji_max' => 'nullable|numeric|min:0|gte:gaji_min',
-            'kontak_email' => 'required|email|max:100',
-            'kontak_phone' => 'nullable|string|max:20',
-        ]);
-
-        JobVacancy::create([
-            'judul' => $validated['judul'],
-            'perusahaan' => $validated['perusahaan'],
-            'tipe_pekerjaan' => $validated['tipe_pekerjaan'],
-            'lokasi' => $validated['lokasi'],
-            'deskripsi' => $validated['deskripsi'],
-            'persyaratan' => $validated['persyaratan'] ?? null,
-            'gaji_min' => $validated['gaji_min'] ?? null,
-            'gaji_max' => $validated['gaji_max'] ?? null,
-            'kontak_email' => $validated['kontak_email'],
-            'kontak_phone' => $validated['kontak_phone'] ?? null,
-            'posted_by' => Auth::id(),
-            'status' => 'pending' // Menunggu persetujuan admin
-        ]);
-
-        return redirect()->route('profil')->with('success', 'Lowongan berhasil diunggah! Menunggu persetujuan admin.');
-    }
-
-    /**
-     * Alumni - Lihat lowongan yang pending dan approved dari profil
-     */
-    public function getProfileJobs()
-    {
-        $pendingJobs = JobVacancy::where('posted_by', Auth::id())
-            ->where('status', 'pending')
-            ->latest()
-            ->get();
-
-        $approvedJobs = JobVacancy::where('posted_by', Auth::id())
-            ->where('status', 'approved')
-            ->latest()
-            ->get();
-
-        return compact('pendingJobs', 'approvedJobs');
+        JobVacancy::findOrFail($id)->delete();
+        
+        return redirect()
+            ->route('admin.jobs.index')
+            ->with('success', 'Lowongan berhasil dihapus.');
     }
 }

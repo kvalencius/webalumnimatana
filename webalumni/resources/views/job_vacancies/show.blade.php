@@ -1,193 +1,175 @@
-@extends('layout.layout')
+@extends('layout.app')
 
-@section('title', 'Detail Lowongan - ' . $job->judul)
+@section('content')
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
-@section('isiWebsite')
 <style>
-    /* Content Spacer untuk Navbar Fixed */
-    .job-detail-area {
-        padding-top: 140px;
-        padding-bottom: 100px;
-        background: #f4f7fb;
-        min-height: 100vh;
+    /* 1. HILANGKAN ELEMEN TEMPLATE LAMA */
+    .main-banner, .left-image, .right-image, .dots, .circle, canvas, 
+    .main-banner:after, .main-banner:before, #top {
+        display: none !important;
     }
 
-    /* Card Utama dengan Soft Shadow */
-    .main-job-card {
+    /* 2. WRAPPER UTAMA */
+    .detail-page-wrapper {
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        background-color: #f8fafc;
+        min-height: 100vh;
+        padding-top: 120px;
+        padding-bottom: 80px;
+    }
+
+    /* 3. HERO SECTION (NAVY BSI STYLE) */
+    .hero-detail {
+        background: linear-gradient(135deg, #002d72 0%, #001a41 100%);
+        padding: 60px 0;
+        color: white;
+        border-bottom: 5px solid #00a1e4;
+        margin-bottom: -100px; /* Menarik konten bawah ke atas */
+    }
+
+    /* 4. CONTENT CARD */
+    .main-card {
         background: white;
-        border: none;
-        border-radius: 25px;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        border-radius: 24px;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.05);
+        border: 1px solid #eef2f6;
         overflow: hidden;
     }
 
-    /* Hero Section di dalam Card */
-    .job-hero-header {
-        background: linear-gradient(135deg, #4b8ef1 0%, #2b6ed1 100%);
-        padding: 50px 40px;
-        color: white;
+    .poster-container {
+        background: #fff;
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
     }
 
-    .job-badge {
-        background: rgba(255, 255, 255, 0.2);
-        backdrop-filter: blur(5px);
-        padding: 6px 15px;
-        border-radius: 50px;
-        font-size: 13px;
-        font-weight: 600;
-        letter-spacing: 0.5px;
-    }
-
-    /* Animasi Tombol Lamar */
-    .btn-apply-animated {
-        background: #ffffff;
-        color: #4b8ef1;
-        padding: 15px 35px;
-        border-radius: 50px;
-        font-weight: 800;
-        text-transform: uppercase;
-        border: none;
-        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        display: inline-block;
-        text-decoration: none;
-        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-    }
-
-    .btn-apply-animated:hover {
-        transform: scale(1.05) translateY(-5px);
-        box-shadow: 0 15px 25px rgba(0,0,0,0.2);
-        color: #1a5bb8;
-    }
-
-    /* Sidebar Info Box */
-    .sidebar-summary {
-        background: #ffffff;
-        border: 1px solid #edf2f7;
-        border-radius: 20px;
-        padding: 25px;
-    }
-
-    .info-item {
-        display: flex;
-        align-items: center;
-        margin-bottom: 20px;
-    }
-
-    .info-icon {
-        width: 45px;
-        height: 45px;
-        background: #f0f7ff;
-        color: #4b8ef1;
-        border-radius: 12px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-right: 15px;
-        font-size: 18px;
-    }
-
-    /* Section Styling */
-    .detail-label {
-        color: #4b8ef1;
-        font-weight: 800;
-        font-size: 14px;
-        text-transform: uppercase;
-        letter-spacing: 1.2px;
-        margin-bottom: 15px;
+    .poster-container img {
+        width: 100%;
+        height: auto;
         display: block;
+    }
+
+    .badge-blue {
+        background: #e0f2fe;
+        color: #0369a1;
+        padding: 6px 16px;
+        border-radius: 100px;
+        font-weight: 600;
+        font-size: 0.85rem;
+    }
+
+    .info-label {
+        color: #64748b;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-weight: 700;
+        margin-bottom: 5px;
+    }
+
+    .btn-apply {
+        background: #00a1e4;
+        color: white !important;
+        padding: 15px 30px;
+        border-radius: 14px;
+        font-weight: 800;
+        text-align: center;
+        display: block;
+        transition: 0.3s;
+        text-decoration: none;
+        box-shadow: 0 10px 20px rgba(0, 161, 228, 0.2);
+    }
+
+    .btn-apply:hover {
+        background: #002d72;
+        transform: translateY(-3px);
+    }
+
+    .content-section {
+        border-bottom: 1px solid #f1f5f9;
+        padding-bottom: 25px;
+        margin-bottom: 25px;
+    }
+
+    .content-section:last-child {
+        border-bottom: none;
     }
 </style>
 
-<div class="job-detail-area">
-    <div class="container">
-        
-        <div class="mb-4">
-            <a href="{{ route('jobs.index') }}" class="text-muted text-decoration-none fw-bold">
-                <i class="fas fa-chevron-left me-2"></i> Eksplor Lowongan Lain
+<div class="detail-page-wrapper">
+    <header class="hero-detail">
+        <div class="container text-center">
+            <a href="{{ url('lowongan') }}" class="text-white-50 text-decoration-none mb-3 d-inline-block hover:text-white">
+                <i class="fas fa-arrow-left me-2"></i> Kembali ke Daftar
             </a>
+            <h1 class="fw-800 display-6">{{ $job->judul }}</h1>
+            <p class="fs-5 opacity-75">{{ $job->perusahaan }}</p>
         </div>
+    </header>
 
-        <div class="main-job-card">
-            <div class="job-hero-header text-center text-md-start">
-                <div class="row align-items-center">
-                    <div class="col-md-8">
-                        <div class="d-flex gap-2 justify-content-center justify-content-md-start mb-3">
-                            <span class="job-badge"><i class="fas fa-briefcase me-1"></i> {{ str_replace('_', ' ', $job->tipe_pekerjaan) }}</span>
-                            <span class="job-badge bg-white text-primary"><i class="fas fa-check-circle me-1"></i> Aktif</span>
+    <div class="container" style="position: relative; z-index: 20;">
+        <div class="row g-4">
+            <div class="col-lg-8">
+                <div class="main-card p-4 p-md-5">
+                    
+                    <div class="d-flex flex-wrap gap-2 mb-4 d-lg-none">
+                        <span class="badge-blue"><i class="fas fa-map-marker-alt me-1"></i> {{ $job->lokasi }}</span>
+                        <span class="badge-blue"><i class="fas fa-calendar-alt me-1"></i> Batas: {{ $job->deadline ?? '-' }}</span>
+                    </div>
+
+                    <div class="content-section">
+                        <h4 class="fw-800 mb-3 text-navy">Deskripsi Pekerjaan</h4>
+                        <div class="text-secondary leading-relaxed">
+                            {!! nl2br(e($job->deskripsi)) !!}
                         </div>
-                        <h1 class="display-6 fw-bold mb-2">{{ $job->judul }}</h1>
-                        <p class="fs-5 opacity-75 mb-0"><i class="fas fa-building me-2"></i>{{ $job->perusahaan }}</p>
                     </div>
-                    <div class="col-md-4 text-center text-md-end mt-4 mt-md-0">
-                        <a href="mailto:{{ $job->kontak_email }}" class="btn-apply-animated">
-                            Lamar Sekarang <i class="fas fa-paper-plane ms-2"></i>
-                        </a>
+
+                    <div class="content-section">
+                        <h4 class="fw-800 mb-3 text-navy">Persyaratan / Kualifikasi</h4>
+                        <div class="text-secondary leading-relaxed">
+                            {!! nl2br(e($job->syarat)) !!}
+                        </div>
                     </div>
+
                 </div>
             </div>
 
-            <div class="p-4 p-md-5">
-                <div class="row g-5">
-                    <div class="col-lg-7">
-                        <div class="mb-5">
-                            <span class="detail-label">Deskripsi Pekerjaan</span>
-                            <div class="text-secondary lh-lg" style="font-size: 1.1rem;">
-                                {!! nl2br(e($job->deskripsi)) !!}
+            <div class="col-lg-4">
+                <div class="sticky-top" style="top: 130px; z-index: 5;">
+                    <div class="poster-container mb-4">
+                        @if($job->poster_image)
+                            <img src="{{ asset('storage/'.$job->poster_image) }}" alt="Poster Detail">
+                        @else
+                            <div class="bg-light d-flex align-items-center justify-content-center p-5 text-muted">
+                                <i class="fas fa-image fa-3x"></i>
                             </div>
-                        </div>
-
-                        @if($job->persyaratan)
-                        <div class="mb-4">
-                            <span class="detail-label">Persyaratan Utama</span>
-                            <div class="text-secondary lh-lg" style="font-size: 1.1rem;">
-                                {!! nl2br(e($job->persyaratan)) !!}
-                            </div>
-                        </div>
                         @endif
                     </div>
 
-                    <div class="col-lg-5">
-                        <div class="sidebar-summary sticky-top" style="top: 100px;">
-                            <h5 class="fw-bold mb-4">Ringkasan Info</h5>
-                            
-                            <div class="info-item">
-                                <div class="info-icon"><i class="fas fa-map-marker-alt"></i></div>
-                                <div>
-                                    <small class="text-muted d-block">Lokasi</small>
-                                    <span class="fw-bold text-dark">{{ $job->lokasi }}</span>
-                                </div>
-                            </div>
+                    <div class="main-card p-4">
+                        <div class="mb-4">
+                            <p class="info-label">Lokasi Penempatan</p>
+                            <p class="fw-bold text-dark"><i class="fas fa-map-pin text-primary me-2"></i> {{ $job->lokasi }}</p>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <p class="info-label">Batas Lamaran</p>
+                            <p class="fw-bold text-danger"><i class="fas fa-clock me-2"></i> {{ $job->deadline ?? 'Hingga Terpenuhi' }}</p>
+                        </div>
 
-                            <div class="info-item">
-                                <div class="info-icon text-success" style="background: #e9fbf0;"><i class="fas fa-wallet"></i></div>
-                                <div>
-                                    <small class="text-muted d-block">Estimasi Gaji</small>
-                                    <span class="fw-bold text-dark">
-                                        @if($job->gaji_min)
-                                            Rp{{ number_format($job->gaji_min, 0, ',', '.') }} - Rp{{ number_format($job->gaji_max, 0, ',', '.') }}
-                                        @else
-                                            Negotiable
-                                        @endif
-                                    </span>
-                                </div>
+                        <a href="{{ $job->link_lamar ?? '#' }}" target="_blank" class="btn-apply">
+                            Lamar Sekarang <i class="fas fa-external-link-alt ms-2"></i>
+                        </a>
+                        
+                        <div class="mt-4 text-center">
+                            <small class="text-muted">Bagikan lowongan ini:</small>
+                            <div class="mt-2 d-flex justify-content-center gap-3">
+                                <a href="https://wa.me/?text={{ urlencode(url()->current()) }}" target="_blank" class="text-success"><i class="fab fa-whatsapp fa-lg"></i></a>
+                                <a href="#" class="text-primary"><i class="fab fa-facebook fa-lg"></i></a>
+                                <a href="#" class="text-info"><i class="fab fa-linkedin fa-lg"></i></a>
                             </div>
-
-                            <div class="info-item">
-                                <div class="info-icon text-danger" style="background: #fff5f5;"><i class="fas fa-envelope"></i></div>
-                                <div>
-                                    <small class="text-muted d-block">Kontak HRD</small>
-                                    <span class="fw-bold text-dark">{{ $job->kontak_email }}</span>
-                                </div>
-                            </div>
-
-                            @if(Auth::id() == $job->user_id)
-                            <hr class="my-4">
-                            <div class="d-grid gap-2">
-                                <a href="{{ route('jobs.edit', $job->id) }}" class="btn btn-outline-primary rounded-pill fw-bold">
-                                    <i class="fas fa-edit me-2"></i> Edit Postingan
-                                </a>
-                            </div>
-                            @endif
                         </div>
                     </div>
                 </div>
