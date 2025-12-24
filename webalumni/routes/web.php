@@ -8,6 +8,7 @@ use App\Http\Controllers\TracerStudyController;
 use App\Http\Controllers\JobVacancyController;
 use App\Http\Controllers\PeopleController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\MajorController; 
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -83,6 +84,8 @@ Route::middleware(['auth'])->group(function () {
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
     // TAMBAHKAN BARIS INI (Penting agar error 'not defined' hilang)
     Route::get('/dashboard', [AdminController::class, 'adminDashboard'])->name('dashboard');
+    // TAMBAHKAN BARIS INI UNTUK JURUSAN
+    Route::resource('majors', MajorController::class);
     // List semua lowongan untuk admin
     Route::get('/lowongan', [JobVacancyController::class, 'adminIndex'])->name('jobs.index');
     

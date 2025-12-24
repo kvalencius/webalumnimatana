@@ -12,35 +12,39 @@
         .sidebar a { color: rgba(255,255,255,0.8); text-decoration: none; padding: 12px 20px; display: block; }
         .sidebar a:hover, .sidebar a.active { background: #00a1e4; color: white; }
         .main-content { margin-left: 250px; padding: 30px; }
-        .stat-card { border: none; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
     </style>
 </head>
 <body>
     <div class="sidebar">
-    <div class="p-4 text-center">
-        <h5 class="fw-bold">ALUMNI MATANA</h5>
-        <hr>
+        <div class="p-4 text-center">
+            <h5 class="fw-bold">ALUMNI MATANA</h5>
+            <hr>
+        </div>
+        
+        <a href="{{ route('admin.dashboard') }}" class="{{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
+            <i class="fas fa-home me-2"></i> Dashboard
+        </a>
+
+        <div class="px-3 py-2 small text-uppercase opacity-50">Data Master</div>
+        <a href="{{ route('admin.majors.index') }}" class="{{ request()->routeIs('admin.majors.*') ? 'active' : '' }}">
+            <i class="fas fa-graduation-cap me-2"></i> Jurusan
+        </a>
+
+        <div class="px-3 py-2 small text-uppercase opacity-50">Content</div>
+        <a href="{{ route('admin.jobs.index') }}" class="{{ request()->routeIs('admin.jobs.*') ? 'active' : '' }}">
+            <i class="fas fa-briefcase me-2"></i> Lowongan Kerja
+        </a>
+        
+        <a href="{{ route('logout') }}" class="mt-auto text-danger">
+            <i class="fas fa-sign-out-alt me-2"></i> Logout
+        </a>
     </div>
-    
-    <a href="{{ route('admin.dashboard') }}" class="{{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
-        <i class="fas fa-home me-2"></i> Dashboard
-    </a>
-
-    <div class="px-3 py-2 small text-uppercase opacity-50">Data Master</div>
-    <a href="#"><i class="fas fa-graduation-cap me-2"></i> Jurusan</a>
-
-    <div class="px-3 py-2 small text-uppercase opacity-50">Alumni</div>
-    <a href="#"><i class="fas fa-users me-2"></i> Data Alumni</a>
-    
-    <div class="px-3 py-2 small text-uppercase opacity-50">Content</div>
-    <a href="#"><i class="fas fa-newspaper me-2"></i> Berita / Event</a>
-    <a href="{{ route('admin.jobs.index') }}" class="{{ request()->routeIs('admin.jobs.index') ? 'active' : '' }}">
-        <i class="fas fa-briefcase me-2"></i> Lowongan Kerja
-    </a>
-</div>
 
     <div class="main-content">
+        {{-- Area ini akan diisi oleh konten dari index.blade.php --}}
         @yield('admin_content')
     </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
