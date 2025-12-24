@@ -17,10 +17,15 @@ return new class extends Migration
         $table->string('email')->unique();
         $table->string('password');
 
-        $table->timestamp('created_at')->useCurrent();
+        $table->enum('role', [
+        'admin',
+        'mahasiswa',
+        'alumni'
+    ])->default('mahasiswa');
+
+        $table->timestamps();        // created_at & updated_at
         $table->timestamp('last_login')->nullable();
-        $table->timestamp('updated_at')->nullable();
-       
+
     });
 
     }

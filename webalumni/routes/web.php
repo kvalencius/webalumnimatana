@@ -7,17 +7,12 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\TracerStudyController;
 use App\Http\Controllers\JobVacancyController;
 use App\Http\Controllers\PeopleController;
-use Illuminate\Container\Attributes\DB;
-
+use App\Http\Controllers\AdminController;
+use App\Http\Controllers\MajorController; 
 /*
 |--------------------------------------------------------------------------
 | Web Routes
 |--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "web" middleware group. Make something great!
-|
 */
 
 // PUBLIC PAGES
@@ -25,7 +20,6 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/tentang', [HomeController::class, 'tentang'])->name('tentang');
 Route::get('/berita', [HomeController::class, 'berita'])->name('berita');
 Route::get('/berita/{id}', [HomeController::class, 'show_post'])->name('berita.show');
-Route::get('/lowongan', [JobVacancyController::class, 'index'])->name('lowongan');
 Route::get('/events', [HomeController::class, 'events'])->name('events');
 
 // Public listing: mahasiswa aktif dan alumni
@@ -46,65 +40,6 @@ Route::get('/debug/alumni/{id}', function ($id) {
     ]);
 })->middleware('auth');
 
-// Public Auth Routes
-Route::get('/daftar', [AuthController::class, 'registrationForm'])->name('daftar');
-Route::post('/daftar', [AuthController::class, 'register']);
-Route::get('/login', [AuthController::class, 'loginForm'])->name('login');
-Route::post('/login', [AuthController::class, 'login']);
-
-// Protected Auth Routes
-Route::middleware('auth')->group(function () {
-    Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
-    Route::get('/profil', [AuthController::class, 'profil'])->name('profil');
-    
-    // Profile picture upload
-    Route::post('/profile-picture', [AuthController::class, 'updateProfilePicture'])->name('profile.picture.update');
-    
-    // Profile Job Vacancies Upload
-    Route::post('/profile/job-upload', [JobVacancyController::class, 'storeFromProfile'])->name('profile.jobs.store');
-    
-    // Tracer Study Routes
-    Route::get('/tracer-study', [TracerStudyController::class, 'showForm'])->name('tracer.form');
-    Route::post('/tracer-study', [TracerStudyController::class, 'store'])->name('tracer.store');
-});
-
-// Alumni routes
-Route::resource('alumni', AlumniController::class);
-
-// Job Vacancy Routes - PUBLIK
-Route::get('/jobs', [JobVacancyController::class, 'index'])->name('jobs.index');
-
-Route::middleware('auth')->group(function () {
-    // PENTING: Route /jobs/create HARUS di atas /jobs/{id}
-    Route::get('/jobs/create', [JobVacancyController::class, 'create'])->name('jobs.create');
-    Route::post('/jobs', [JobVacancyController::class, 'store'])->name('jobs.store');
-    
-    // My Jobs
-    Route::get('/my-jobs', [JobVacancyController::class, 'myJobs'])->name('jobs.my-jobs');
-    
-    // Edit & Delete
-    Route::get('/jobs/{id}/edit', [JobVacancyController::class, 'edit'])->name('jobs.edit');
-    Route::put('/jobs/{id}', [JobVacancyController::class, 'update'])->name('jobs.update');
-    Route::delete('/jobs/{id}', [JobVacancyController::class, 'destroy'])->name('jobs.destroy');
-});
-
-// Route dengan parameter {id} HARUS paling bawah
-Route::get('/jobs/{id}', [JobVacancyController::class, 'show'])->name('jobs.show');
-// Admin & Teacher
-Route::middleware(['auth', 'role:admin,teacher'])->group(function () {
-    Route::get('/admin/jobs', [JobVacancyController::class, 'adminIndex'])->name('jobs.admin');
-    Route::post('/jobs/{id}/approve', [JobVacancyController::class, 'approve'])->name('jobs.approve');
-    Route::post('/jobs/{id}/reject', [JobVacancyController::class, 'reject'])->name('jobs.reject');
-});
-// Alumni resource routes
-Route::resource('alumni', AlumniController::class)->middleware('auth');
-
-// Student resource routes (for future expansion)
-Route::resource('student', 'App\Http\Controllers\StudentController')->middleware('auth');
-
-// Teacher resource routes (for future expansion)
-Route::resource('teacher', 'App\Http\Controllers\TeacherController')->middleware('auth');
-
 // Temporary debug route to inspect DB content for lists page
 Route::get('/debug/lists', function () {
     try {
@@ -122,4 +57,71 @@ Route::get('/debug/lists', function () {
     } catch (\Exception $e) {
         return response()->json(['error' => $e->getMessage()], 500);
     }
+});
+
+// Public Auth Routes
+Route::get('/daftar', [AuthController::class, 'registrationForm'])->name('daftar');
+Route::post('/daftar', [AuthController::class, 'register']);
+Route::get('/login', [AuthController::class, 'loginForm'])->name('login');
+Route::post('/login', [AuthController::class, 'login']);
+
+// =======================
+// LOWONGAN KERJA - UNTUK SEMUA USER YANG LOGIN
+// (Mahasiswa Aktif, Alumni, dan Admin bisa lihat)
+// =======================
+Route::middleware(['auth'])->group(function () {
+    // Halaman list lowongan (READ ONLY untuk mahasiswa & alumni)
+    Route::get('/lowongan', [JobVacancyController::class, 'index'])->name('jobs.index');
+    
+    // Detail lowongan (READ ONLY untuk mahasiswa & alumni)
+    Route::get('/lowongan/{id}', [JobVacancyController::class, 'show'])->name('jobs.show');
+});
+
+// =======================
+// ADMIN - KELOLA LOWONGAN KERJA
+// (CRUD - Create, Read, Update, Delete)
+// =======================
+Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
+    // TAMBAHKAN BARIS INI (Penting agar error 'not defined' hilang)
+    Route::get('/dashboard', [AdminController::class, 'adminDashboard'])->name('dashboard');
+    // TAMBAHKAN BARIS INI UNTUK JURUSAN
+    Route::resource('majors', MajorController::class);
+    // List semua lowongan untuk admin
+    Route::get('/lowongan', [JobVacancyController::class, 'adminIndex'])->name('jobs.index');
+    
+    // Create lowongan baru
+    Route::get('/lowongan/create', [JobVacancyController::class, 'create'])->name('jobs.create');
+    Route::post('/lowongan', [JobVacancyController::class, 'store'])->name('jobs.store');
+    
+    // Edit & Update lowongan
+    Route::get('/lowongan/{id}/edit', [JobVacancyController::class, 'edit'])->name('jobs.edit');
+    Route::put('/lowongan/{id}', [JobVacancyController::class, 'update'])->name('jobs.update');
+    
+    // Delete lowongan
+    Route::delete('/lowongan/{id}', [JobVacancyController::class, 'destroy'])->name('jobs.destroy');
+});
+
+// Protected Auth Routes
+Route::middleware('auth')->group(function () {
+    Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
+    Route::get('/profil', [AuthController::class, 'profil'])->name('profil');
+    
+    // Profile picture upload
+    Route::post('/profile-picture', [AuthController::class, 'updateProfilePicture'])->name('profile.picture.update');
+    
+    // Profile Job Vacancies Upload
+    Route::post('/profile/job-upload', [JobVacancyController::class, 'storeFromProfile'])->name('profile.jobs.store');
+    
+    // Tracer Study Routes
+    Route::get('/tracer-study', [TracerStudyController::class, 'showForm'])->name('tracer.form');
+    Route::post('/tracer-study', [TracerStudyController::class, 'store'])->name('tracer.store');
+    
+    // Alumni resource routes
+    Route::resource('alumni', AlumniController::class);
+    
+    // Student resource routes (for future expansion)
+    Route::resource('student', 'App\Http\Controllers\StudentController');
+    
+    // Teacher resource routes (for future expansion)
+    Route::resource('teacher', 'App\Http\Controllers\TeacherController');
 });

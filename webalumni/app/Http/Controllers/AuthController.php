@@ -156,34 +156,37 @@ class AuthController extends Controller
         return redirect('/profil')->with('success', 'Data Anda berhasil disimpan');
     }
 
-    public function profil()
-    {
-        $user = Auth::user();
-        $data = null;
-        $pendingJobs = collect();
-        $approvedJobs = collect();
+   public function profil()
+{
+    $user = Auth::user();
+    $data = null;
+    $jobVacancies = collect();
 
-        if ($user->role === 'alumni') {
-            $data = Alumni::with('tracerStudy')->find($user->id);
-            
-            // Get job vacancies for alumni
-            $pendingJobs = JobVacancy::where('posted_by', $user->id)
-                ->where('status', 'pending')
-                ->latest()
-                ->get();
+    if ($user->role === 'alumni') {
+        // Data alumni
+        $data = Alumni::where('user_id', $user->id)->first();
 
-            $approvedJobs = JobVacancy::where('posted_by', $user->id)
-                ->where('status', 'approved')
-                ->latest()
-                ->get();
-        } elseif ($user->role === 'student') {
-            $data = Student::where('user_id', $user->id)->first();
-        } elseif ($user->role === 'teacher') {
-            $data = Teacher::find($user->id);
-        }
+        // Alumni hanya lihat lowongan miliknya
+        $jobVacancies = JobVacancy::where('posted_by', $user->id)
+            ->latest()
+            ->get();
 
-        return view('user.profil', compact('user', 'data', 'pendingJobs', 'approvedJobs'));
+    } elseif ($user->role === 'student') {
+        // Data mahasiswa aktif
+        $data = Student::where('user_id', $user->id)->first();
+
+    } elseif ($user->role === 'teacher') {
+        // Data dosen
+        $data = Teacher::where('user_id', $user->id)->first();
+
+    } elseif ($user->role === 'admin') {
+        // Admin bisa lihat SEMUA data
+        $jobVacancies = JobVacancy::latest()->get();
     }
+
+    return view('user.profil', compact('user', 'data', 'jobVacancies'));
+}
+
 
     public function updateProfilePicture(Request $request)
     {
