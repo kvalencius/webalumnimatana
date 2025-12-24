@@ -6,7 +6,7 @@
         <nav class="main-nav">
           <!-- ***** Logo Start ***** -->
           <a href="/" class="logo">
-            <img src="assets/images/logo_matana.png" alt="Matana University">
+            <img src="{{ asset('assets/images/logo_matana.png') }}" alt="Matana University" style="height: 40px; width: auto;">
           </a>
           <!-- ***** Logo End ***** -->
 
